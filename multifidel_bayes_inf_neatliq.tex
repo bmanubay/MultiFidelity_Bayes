@@ -145,18 +145,19 @@ Definitions
 \section{Introduction}
 \begin{itemize}
 	\item MD as a critical research tool
+	%MD would be great, but FF issues
+	%Huge amount of work to get protein relatively correct
 	\begin{itemize}
-		\item The development of force fields, which are readily transferable between dissimilar physical systems and are 
-		quantitatively accurate, are imperative for the use of molecular simulation driven studies to continue to proliferate.\cite{villin,villin2,drug_discov}
+		\item Force fields that are transferable and quantitatively accurate are necessary for molecular simulation to be useful. \cite{villin,villin2,drug_discov}
 	\end{itemize}
-    \item Transferability issues
+    \item Transferability and inaccuracy issues
     \begin{itemize}
-    	\item Transferability of MD force fields, and particularly sets of force field parameters, is an extremely popular 
-              topic, and current limitation, in the molecular simulation field.\cite{transferability1,transferability2,
+    	\item Transferability of MD force fields, and particularly sets of force field parameters, is a current limitation 
+    	      in the molecular simulation field.\cite{transferability1,transferability2,
     	      transferability3,transferability4}  
         \item Inaccurate and poorly parameterized force fields have been shown to grossly misrepresent molecular systems.
               \cite{ffcomp1,ffcomp2,robustness} 
-        \item It has been shown that depending on the choice of force field, the same experiments can produce quantitatively
+        \item It has been shown that depending on the choice of force field, the same experiments for the same or similar systems can produce quantitatively
               different results, making the choice of force field far more important than it should be. \cite{ffcomp1,ffcomp2,ewen_comparison_2016,petrov_are_2014,guvench_comparison_2008}\\
     \end{itemize}
 	\item Parameterization efforts
@@ -167,19 +168,21 @@ Definitions
 			      chemists.\cite{parm94,tip3p,burger,law,combined,rational,aipar,charmm1,charmm2,mm1,mm2,mmff}
 			\item Despite attempts at improvement, many of the functional forms and parameters of popular force fields remain mostly 
 			      unchanged due to the lack of clear, systematic methods for updating them.\cite{unchanged,monticelli}
-			\item Many early force fields were parameterized manually for narrow classes of molecules with large redundant parameter spaces.\cite{mm1}
+			\item Force fields like AMBER \textit{parm94} showed intuitive departure by shrinking parameter space with clever atom typing 
+			      defined by expert computational chemists.\cite{parm94}
 		\end{itemize}
 	    \item Second Gen
 	    \begin{itemize}
 		    \item The parameterization of GAFF used a semi-automated genetic algorithm approach 
 		          to select parameters.\cite{amber}
-		    \item Force fields like AMBER \textit{parm94} showed intuitive departure by shrinking parameter space with clever atom typing 
-		          defined by expert computational chemists.\cite{parm94}
+		    \item The parameterization of the rigid Tip4p-Ew model utilized a unique gradient assisted method. \cite{tip4pew}
+		    \item An incredible amount of work over a long period of time has still been necessary to get biomolecular force fields somewhat
+		          correct.\cite{GROMOS53A5}
 	    \end{itemize}
         \item Current efforts
         \begin{itemize}
         	\item A few notable attempts, such as GAAMP and ForceBalance, have been made in recent years towards the 
-        	      development of more automated and systematic force field parameterization methods.\cite{GAAMP,FB1,FB2,FB3,tip4pew} 
+        	      development of more automated and systematic force field parameterization methods.\cite{GAAMP,FB1,FB2,FB3} 
         	\item Each made important contributions to automated force field parameterization through clever use of objective function 
         	      optimization, exploiting a variety of fitting data and allowing exploration of functional forms. 
         	%\item Even with these more sophisticated
@@ -195,23 +198,27 @@ Definitions
     	\begin{itemize}
     		\item Bayesian inference provides a robust statistical framework for force field parameterization. 
     		      It has been shown that Bayesian approaches can be applied to a wide variety of data driven sciences.
-    		      \cite{bayes1,bayes2,bayes3,bayes4,bayes5,bayes6,bayes7,bayes8,bayes_coarse} 
+    		      \cite{bayes1,bayes2,bayes3,bayes5,bayes6,bayes7,bayes8,bayes_coarse} 
     		%\item Bayesian methods have been used for balancing data to help minimize influence of oversampled populations and generate more robust predictive   
     		%      models\cite{bayes2} to recalibrating initial force estimates in coarse grained MD models to target atomistic MD and experimental data
     		%      \cite{bayes_coarse,bayes1}. 
-    		\item Would also include citations for UQ literature and the limited applications to MD parameterization thus far
+    		\item Bayesian inference methods have also been applied for uncertainty quantification in MD as well as limited parameterization
+    		      problems on simple Lennard-Jones systems. \cite{bayes4,UQMDrizzi,LJexpBayes}
+    		% See if i can cite that unpublished MD UQ chapter from NIST
     	\end{itemize}
         \item Surrogate models/metamodels
         \begin{itemize}
         	\item Metamodeling has been critical in accelerating sampling driven processes which involve expensive calculations \cite{mbar}
-        	\item Need to include citations for the Bayes inference MD parameterization by the stats guys at ETH
-    	    \item Should also find a few more examples
+        	\item Need to include citations for the Bayes inference MD parameterization by the stats guys at ETH \cite{LJexpBayes}
+    	    \item COFFE papers \cite{CoffeFull}    	    
         \end{itemize}    
         \item What our ideas for parameterization are/paper overall thesis
         \begin{itemize}
         	\item \textbf{Through systematically testing different multi-fidelity likelihood estimation workflows, we have found an optimal process which 
         	      maximizes computational efficiency while yielding a force field nearly identical to that which would be produced
         	      by a parameterization utilizing solely MD simulation for optimization.}
+            \item How can we combine different techniques, to find reasonable force fields in medium dimensionality in a computationally efficient manner
+            
         	%\item Full automation of finding likely parameter consistent
         	%      with a set of experimental data
         	%\item Exploration and quantitative comparison of model forms
@@ -232,6 +239,7 @@ Definitions
 		\item Non-bonded for cyclohexane and ethanol 
 		\item Since we're switching to neat organic parameterization, I'm going to add a few more molecules,
 		      but try to keep the number of parameters capped at 10 (chain alkanes, cyclic alcohols, etc.)
+		% Need to decide which molecules
 		\item 10
 		\item Specific SMIRKS:
 		\begin{itemize}
@@ -282,64 +290,50 @@ Definitions
     	
     	%------------------------------------------------------------------------------------------------------------------------
     	
-    	\subsubsection{Heat Capacity}
-    	The definition of the isobaric heat capacity is:
-    	\begin{equation}C_P = \left( \frac{\partial H}{\partial T}\right)_{P,N}\end{equation}
-    	%MRS: probably easier to take df/dbeta, and then take the temperature derivaive, which can be converted into a second beta derivative by a change of variable, so it's a 2nd derivative of f WRT beta, with some prefactors of beta.
-    	\begin{equation}C_P =  \frac{\partial \left(\frac{\partial f}{\partial \beta}\right)}{\partial T}_{P,N}\end{equation}
-    	\begin{equation}C_P = k_B \beta^2 \frac{\partial^2 f}{\partial \beta^2}\end{equation}
+        \subsubsection{Speed of Sound}
+        The definition of the speed of sound is\cite{sos}:
+        \begin{equation}c^2 = \left(\frac{\partial P}{\partial \rho}\right)_{S} = -\frac{V^2}{M}\left(\frac{\partial P}{\partial V}\right)_{S}\end{equation}
+        
+        %MRS: I'd make the derivation more explicit, breakin down (dP/dV)_S -> in terms of the triple product rule, and then expressing it a a function of explicit deriatives, so it's clear what evaluations would be needed. 
+        
+        \begin{equation}c^2 = \frac{V^2}{\beta M}\left[\frac{\left(\frac{\gamma_V}{k_B}\right)^2}{\frac{C_V}{k_B}} + \frac{\beta}{V \kappa_T}\right]\end{equation}\\*
+        
+        Where:\\*
+        \begin{equation}\gamma_V = \left(\frac{\partial P}{\partial T}\right)_{V}\end{equation}\\*
+        
+        $\gamma_V$ is known as the isochoric pressure coefficient. $\kappa_T$ is the same isothermal compressibility from equation 20\\*
+        
+        %BCM: Did this derivation myself, pretty sure it's right
+        An alternate derivation, applying the triple product rule to $\left(\frac{\partial P}{\partial V}\right)_{S}$ yields the following.
+        
+        \begin{equation}\left(\frac{\partial P}{\partial V}\right)_{S} = \frac{\left(\frac{\partial S}{\partial V}\right)_{P}}{\left(\frac{\partial S}{\partial P}\right)_{V}}\end{equation}\\*
+        
+        \begin{equation}\left(\frac{\partial S}{\partial V}\right)_{P} = \left(\frac{\partial S}{\partial T}\right)_{P} \left(\frac{\partial T}{\partial V}\right)_{P} = \frac{C_P}{T} \left(\frac{\partial T}{\partial V}\right)_{P} = \frac{C_P}{T V \alpha}\end{equation}\\*
+        
+        Where $\alpha = \frac{1}{V} \left(\frac{\partial V}{\partial T}\right)_{P} = \left(\frac{\partial \ln V}{\partial T}\right)_{P}$ is the coefficient of thermal expansion. The second term in our triple product rule expansion, $\left(\frac{\partial S}{\partial P}\right)_{V}$, can be expressed as follows:
+        
+        \begin{equation}\left(\frac{\partial S}{\partial P}\right)_{V} = \left(\frac{\partial S}{\partial T}\right)_{V} \left(\frac{\partial T}{\partial P}\right)_{V} = \frac{C_V}{T} \left(\frac{\partial T}{\partial P}\right)_{V} = \frac{C_V}{T \gamma_V}\end{equation}\\* 
+        
+        Thus our derivation yields:
+        \begin{equation}\left(\frac{\partial P}{\partial V}\right)_{S} = \frac{C_P \gamma_V}{C_V V \alpha}\end{equation}\\*
+        
+        Horn et al set out several ways for calculating $\alpha$\cite{horn}:
+        
+        \paragraph{Analytical derivative of density with respect to temperature}
+        \begin{equation}\alpha = -\frac{d\ln\langle \rho \rangle}{dT}\end{equation}
+        
+        \paragraph{Numerical derivative of density over range of T of interest}
+        The same finite differnces approach as shown for isothermal compressibility can be applied here, thus:
+        \begin{multline}
+        \alpha = -\frac{d\ln\langle \rho \rangle}{dT} = \\ -\frac{1}{2\rho(T,P)} \left(\ln \langle \rho(P,T+\Delta T)\rangle - \ln \langle V(P,T-\Delta T)\right\rangle)\end{multline}
+        \paragraph{Using the enthalpy-volume fluctuation formula}
+        \begin{equation}\alpha = \frac{\langle VH \rangle - \langle V \rangle \langle H \rangle}{k_B \langle T \rangle^2 \langle V \rangle}\end{equation}\\*
+        
+        Finite differences approximations and/or analytical derivation can also be used to calculate $\gamma_V$ or by note of the relation:
+        \begin{equation}\gamma_V = - \frac{\alpha}{\kappa_T}\end{equation}\\*
     	
-    	This could be computed by finite differences approach or analytical derivation using MBAR\\*
-    	
-    	The enthalpy fluctuation formula can also be used to calculate $C_P$.
-    	\begin{equation}C_P = \frac{\langle H^2 \rangle - \langle H \rangle^2}{N k_B \langle T \rangle^2}\end{equation}\\*
-    	
-    	%-----------------------------------------------------------------------------------------------------------------------------------
-    	
-    	\item \textbf{More properties for verification (not in training data)}
-    	\item Had discussed enthalpy of vaporization calculations being used in verification 
-    	\subsubsection{Enthalpy of Vaporization}
-    	%MRS: should look at Horne et al (mentioned by Fennell), the original TIP4P-ew
-    	%water paper, to see some of the corrections one can add. Usually,
-    	%these are corrections involving phase changes, but there are a few
-    	%others you should check out.
-    	
-    	The definition of the enthalpy of vaporization is:
-    	\begin{equation}\Delta H_{vap} = H_{gas} - H_{liq} = E_{gas} - E_{liq} + P(V_{gas} - V_{liq})\end{equation}\\*
-    	
-    	If we assume that $V_{gas} >> V_{liq}$ and that the gas is ideal (and therefore kinetic energy terms cancel):
-    	\begin{equation}\Delta H_{vap} = E_{gas, potential} - E_{liq, potential} + R T\end{equation}\\*
-    	
-
-    	\subsection{Suggested Corrections}
-    	\subsubsection{Enthalpy of Vaporization}
-    	An alternate, but similar, method for calculating the enthalpy of vaporization is recommended by Horn et al \cite{tip4pew}.
-    	\begin{equation}\Delta H_{vap} = -\frac{E_{liq, potential}}{N} + R T - P V_{liq} + C\end{equation}\\*
-    	
-    	In the above equation $C$ is a correction factor for vibrational energies, polarizability, non-ideality of the gas and pressure. It can be calculated as follows.
-    	\begin{multline}
-    	C_{vib} = C_{vib,intra} + C_{vib,inter} \\ = \left(E_{vib,QM,gas,intra} - E_{vib,QM,liq,intra}\right) \\ + \left(E_{vib,QM,liq,inter} - E_{vib,CM,liq,inter}\right)
-    	\end{multline}\\*
-    	
-    	The $QM$ and $CM$ subscripts stand for quantum and classical mechanics, resectively. 
-    	\begin{equation}C_{pol} = \frac{N}{2} \frac{\left(d_{gas} - d_{liq}\right)^2}{\alpha_{p,gas}}\end{equation}\\*
-    	
-    	Where $d_i$ is the dipole moment of a molecule in phase $i$ and $\alpha_{p,gas}$ is the mean polarizability of a molecule in the gas phase.
-    	
-    	\begin{equation}C_{ni} = P_{vap} \left(B - T \frac{dB}{dT}\right)\end{equation}\\*
-    	
-    	Where $B$ is the second virial coefficient.
-    	
-    	\begin{equation}C_x = \int_{P_{ext}}^{P_{vap}} \left[V\left(P_{ext}\right)\left[1 - \left(P - P_{ext}\right) \kappa_T\right] - T V \alpha\right] dP\end{equation}\\*
-    	
-    	Where $P_{ext}$ is the external pressure and $V\left(P_{ext}\right)$ is the volume at $P_{ext}$. 
-    	
-    	%MRS: made a complete sentence (plus added some detail)
-    	This is frequently done as a single simulation calculation by assuming
-    	the average intramolecular energy remains constant during the phase
-    	change, which is rigorously correct for something like a rigid water
-    	molecule (intramolecular energies are zero), but less true for
-    	something with structural rearrangement between gas and liquid phases. 
+        %--------------------------------------------------------------------------------------------------------------------------
+        
     \end{itemize}
     \item Methods for metamodeling
     \begin{itemize}
@@ -355,6 +349,10 @@ Definitions
     			\item Enthalpy
     			\begin{equation}
     			\frac{H_{new}}{H_{old}} = \frac{{\sum_i \sum_{j \neq i} N_i N_j \left(\epsilon_i \epsilon_j \right)^{\frac{1}{2}}}_{new}}{{\sum_i \sum_{j \neq i} N_i N_j \left(\epsilon_i \epsilon_j \right)^{\frac{1}{2}}}_{old}}
+    			% Rich pair-correlation function https://www.researchgate.net/profile/Richard_Messerly2
+    			% SAFT (look into) http://pubs.acs.org/doi/abs/10.1021/ie0102201
+    			% Reith papers again
+    			% Cite how they differ
     			\end{equation}
     		\end{itemize}
             \item GP models
@@ -387,8 +385,10 @@ Definitions
                 \end{itemize}         
             \end{itemize}
     	\end{itemize}
-        \item \textbf{Hypothesis: Using different sampling algorithms will affect both the computational expense of parameterization and the distribution of the 
-        	  final posterior}
+        \item \textbf{Hypothesis: With a multi-fidelity hierarchical observable calculation scheme, we can quickly approach the true forward model produced 
+        	          by MD simulation}
+          % Rework hypothesis: With hierarchical modeling we can quickly approach the true forward model produced by simulation
+          
         \item Explanation of potential multi-fidelity posterior sampling algorithms:
         \begin{itemize}
         	\item 3 Levels of property calculation
@@ -399,14 +399,11 @@ Definitions
         		\item Low fidelity: Use data from medium fidelity calculations in order to fit a regression model over a hypervolume of parameter space
         		\begin{itemize}
         			\item For right now, most plausible technique is GP regression, but could brainstorm some others
+        		% Could just do this
+        		% What do marginals around maxima look like as a function of iteration
+        		% Constraints on proposal for using GP in order to keep from moving into regions of high uncertainty
         		\end{itemize}
         	\end{itemize}
-            \item Simple physical surrogate models (2 levels of property estimation)
-            \begin{itemize}
-            	\item High fidelity: Full MD simulation at a single point in parameter space
-            	\item Low fidelity: Using simple, physically motivated models from previous section we can estimate properties at new parameter states
-            	      solely based on how we expect the change in parameters to affect the potential energy
-            \end{itemize}
             \item Using MBAR as a look up table (2 levels of property estimation)
             \begin{itemize}
             	\item High fidelity: Full MD simulation at a single point in parameter space
@@ -417,15 +414,21 @@ Definitions
             		      perform a new simulation and repeat the process
             		\item As we narrow in on the region of highest probability density, we can refine the grid over which we're searching in order to more
             		      accurately represent the final posterior
+            % Could be useful in low dimensionality and to start with
             	\end{itemize}
             \end{itemize}
         \end{itemize}
-        \item Construction of "gold standard" posterior distribution of force field parameters
-        \begin{itemize}
-        	\item Will need to brainstorm best way to go about doing this
-        	\item In theory, we could construct a posterior with purely simulation, but it would take so much resource time
-        	\item Might be a better idea to compare differences in the cheap posteriors we produce 
-        \end{itemize}              
+        %\item Construction of "gold standard" posterior distribution of force field parameters
+        %\begin{itemize}
+        %	\item Will need to brainstorm best way to go about doing this
+        %	\item In theory, we could construct a posterior with purely simulation, but it would take so much resource time
+        %	\item Might be a better idea to compare differences in the cheap posteriors we produce 
+        	% Might need even to do this yet
+        % Ideally we get to same minima every time
+        % Multiple minima: some of the methods Rich developed could be useful for this 
+        % Bias vs. uncertainty trade-off
+        
+        %\end{itemize}              
     \end{itemize}
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -437,21 +440,17 @@ Definitions
 	      speed up over a traditional inference approach with purely simulation used in the likelihood estimate, but 
 	      will also result in a final force field with accuracy rivaling that of the expensive approach.}
 	\item Experiments for testing sampling workflow
-	\begin{itemize}
-		\item Interchanging surrogate models
-		\begin{itemize}
-			\item All combinations of response surface models?
-		\end{itemize}
-	    \item Do we include MBAR?
-	    \begin{itemize}
-	    	\item Use MBAR like a look up table. Don't fit points produced with MBAR. Just MC sample on a grid of points produced with MBAR to see 
-	    	      where the higher probability region is. If on edge, move to edge and simulate again, repeat.
-	    \end{itemize}
-	    \begin{itemize}
-	    	\item Note: Physical surrogates won't make use of MBAR since 
-	    	      there won't be fitting data
-	    \end{itemize}        
-	\end{itemize}
+	%\begin{itemize}
+	%    \item Do we include MBAR?
+	%    \begin{itemize}
+	%    	\item Use MBAR like a look up table. Don't fit points produced with MBAR. Just MC sample on a grid of points produced with MBAR to see 
+	%    	      where the higher probability region is. If on edge, move to edge and simulate again, repeat.
+	%    \end{itemize}
+	%    \begin{itemize}
+	%    	\item Note: Physical surrogates won't make use of MBAR since 
+	%    	      there won't be fitting data
+	%    \end{itemize}        
+	%\end{itemize}
     \item \textbf{Hypothesis: Different sampling algorithms will affect the speed of convergence to our final force field as well final distribution of parameters
           sampled.}
     \item Ideas for comparing force fields resultant from different sampling methods
@@ -459,6 +458,7 @@ Definitions
     \begin{itemize}
     	\item KL divergence
     	\item Speed of convergence
+    	\item Stability of solution (from different starting points do we get same answer?) 
     	\item Simulation of properties, using final parameters, that 
     	      were not in training set
     	\begin{itemize}

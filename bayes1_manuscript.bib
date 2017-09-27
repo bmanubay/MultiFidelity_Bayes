@@ -810,3 +810,52 @@ This book provides a self-contained and up-to-date treatment of the Monte Carlo 
 	file = {Full Text PDF:files/105/Paliwal and Shirts - 2013 - Multistate reweighting and configuration mapping t.pdf:application/pdf;Snapshot:files/106/1.html:text/html}
 }
 """
+
+@article{GROMOS53A5,
+	title = {A biomolecular force field based on the free enthalpy of hydration and solvation: {The} {GROMOS} force-field parameter sets 53A5 and 53A6},
+	volume = {25},
+	issn = {1096-987X},
+	shorttitle = {A biomolecular force field based on the free enthalpy of hydration and solvation},
+	url = {http://onlinelibrary.wiley.com/doi/10.1002/jcc.20090/abstract},
+	doi = {10.1002/jcc.20090},
+	abstract = {Successive parameterizations of the GROMOS force field have been used successfully to simulate biomolecular systems over a long period of time. The continuing expansion of computational power with time makes it possible to compute ever more properties for an increasing variety of molecular systems with greater precision. This has led to recurrent parameterizations of the GROMOS force field all aimed at achieving better agreement with experimental data. Here we report the results of the latest, extensive reparameterization of the GROMOS force field. In contrast to the parameterization of other biomolecular force fields, this parameterization of the GROMOS force field is based primarily on reproducing the free enthalpies of hydration and apolar solvation for a range of compounds. This approach was chosen because the relative free enthalpy of solvation between polar and apolar environments is a key property in many biomolecular processes of interest, such as protein folding, biomolecular association, membrane formation, and transport over membranes. The newest parameter sets, 53A5 and 53A6, were optimized by first fitting to reproduce the thermodynamic properties of pure liquids of a range of small polar molecules and the solvation free enthalpies of amino acid analogs in cyclohexane (53A5). The partial charges were then adjusted to reproduce the hydration free enthalpies in water (53A6). Both parameter sets are fully documented, and the differences between these and previous parameter sets are discussed. © 2004 Wiley Periodicals, Inc. J Comput Chem 25: 1656–1676, 2004},
+	language = {en},
+	number = {13},
+	journal = {J. Comput. Chem.},
+	author = {Oostenbrink, Chris and Villa, Alessandra and Mark, Alan E. and Van Gunsteren, Wilfred F.},
+	month = oct,
+	year = {2004},
+	keywords = {force-field parameterization, free-energy calculation, GROMOS force field, hydration, solvation},
+	pages = {1656--1676},
+	file = {Full Text PDF:C\:\\Users\\Bryce Manubay\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\fjrkfkzw.default\\zotero\\storage\\BSDXTEP3\\Oostenbrink et al. - 2004 - A biomolecular force field based on the free entha.pdf:application/pdf;Snapshot:C\:\\Users\\Bryce Manubay\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\fjrkfkzw.default\\zotero\\storage\\W7KZ2SZQ\\abstract\;jsessionid=4A9510221179B45E17A8B34CDEC03D24.html:text/html}
+}
+
+@article{LJexpBayes,
+	title = {Experimental data over quantum mechanics simulations for inferring the repulsive exponent of the {Lennard}-{Jones} potential in {Molecular} {Dynamics}},
+	url = {http://arxiv.org/abs/1705.08533},
+	abstract = {The Lennard-Jones (LJ) potential is a cornerstone of Molecular Dynamics (MD) simulations and among the most widely used computational kernels in science. The potential models atomistic attraction and repulsion with century old prescribed parameters (\$q=6, {\textbackslash}; p=12\$, respectively), originally related by a factor of two for simplicity of calculations. We re-examine the value of the repulsion exponent through data driven uncertainty quantification. We perform Hierarchical Bayesian inference on MD simulations of argon using experimental data of the radial distribution function (RDF) for a range of thermodynamic conditions, as well as dimer interaction energies from quantum mechanics simulations. The experimental data suggest a repulsion exponent (\$p {\textbackslash}approx 6.5\$), in contrast to the quantum simulations data that support values closer to the original (\$p=12\$) exponent. Most notably, we find that predictions of RDF, diffusion coefficient and density of argon are more accurate and robust in producing the correct argon phase around its triple point, when using the values inferred from experimental data over those from quantum mechanics simulations. The present results suggest the need for data driven recalibration of the LJ potential across MD simulations.},
+	journal = {arXiv:1705.08533 [physics, stat]},
+	author = {Kulakova, Lina and Arampatzis, Georgios and Angelikopoulos, Panagiotis and Chatzidoukas, Panagiotis and Papadimitriou, Costas and Koumoutsakos, Petros},
+	month = may,
+	year = {2017},
+	note = {arXiv: 1705.08533},
+	keywords = {Physics - Chemical Physics, Statistics - Applications},
+	file = {arXiv\:1705.08533 PDF:C\:\\Users\\Bryce Manubay\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\fjrkfkzw.default\\zotero\\storage\\CB9PZ6JB\\Kulakova et al. - 2017 - Experimental data over quantum mechanics simulatio.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\Bryce Manubay\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\fjrkfkzw.default\\zotero\\storage\\4UVN5HFU\\1705.html:text/html}
+}
+
+@article{UQMDrizzi,
+	title = {Uncertainty {Quantification} in {MD} {Simulations}. {Part} {I}: {Forward} {Propagation}},
+	volume = {10},
+	issn = {1540-3459},
+	shorttitle = {Uncertainty {Quantification} in {MD} {Simulations}. {Part} {I}},
+	url = {http://epubs.siam.org/doi/abs/10.1137/110853169},
+	doi = {10.1137/110853169},
+	abstract = {This work focuses on quantifying the effect of intrinsic (thermal) noise and parametric uncertainty in molecular dynamics (MD) simulations. We consider isothermal, isobaric MD simulations of TIP4P (or four-site) water at ambient conditions, \$T=298\$ K and \$P=1\$ atm. Parametric uncertainty is assumed to originate from three force-field parameters that are parametrized in terms of standard uniform random variables. The thermal fluctuations inherent in MD simulations combine with parametric uncertainty to yield nondeterministic, noisy MD predictions of bulk water properties. Relying on polynomial chaos (PC) expansions, we develop a framework that enables us to isolate the impact of parametric uncertainty on the MD predictions and control the effect of the intrinsic noise. We construct the PC representations of quantities of interest (QoIs) using two different approaches: nonintrusive spectral projection (NISP) and Bayesian inference. We verify a priori the legitimacy of the NISP approach by verifying that the MD data satisfy regularity and smoothness conditions in the parameter space. The Bayesian inference approach relies on adaptively sampling the parameter space, based on analyzing the convergence of the PC expansions at different approximation levels. We show that for the present case, the effect of the thermal noise in the atomistic system can be controlled, and the MD predictions for the QoIs can be suitably represented using low-order PC models.},
+	number = {4},
+	journal = {Multiscale Model. Simul.},
+	author = {Rizzi, F. and Najm, H. and Debusschere, B. and Sargsyan, K. and Salloum, M. and Adalsteinsson, H. and Knio, O.},
+	month = jan,
+	year = {2012},
+	pages = {1428--1459},
+	file = {Full Text PDF:C\:\\Users\\Bryce Manubay\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\fjrkfkzw.default\\zotero\\storage\\G6WDPXWG\\Rizzi et al. - 2012 - Uncertainty Quantification in MD Simulations. Part.pdf:application/pdf;Snapshot:C\:\\Users\\Bryce Manubay\\AppData\\Roaming\\Zotero\\Zotero\\Profiles\\fjrkfkzw.default\\zotero\\storage\\NPGDXMUN\\110853169.html:text/html}
+}
