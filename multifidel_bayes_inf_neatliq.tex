@@ -250,6 +250,9 @@ Definitions
     \item Property calculation
     \begin{itemize}
     	\item Densities
+	% BCM: Comment out some of this because we're really only going to be calculating properites one way
+	% BCM: may want to use molar volumes instead of densities so don't have to propogate simulation error to new property.
+	%      Easier to propogate error in experiment and transform experimental property
     	Starting with the equation used to calculate the density experimentally, 
     	\begin{equation} \rho = \frac{M}{V} \end{equation}
     	We replace the average with the esemble estimate (calculated either directly, or with reweighting) to obtain: 
@@ -291,6 +294,10 @@ Definitions
     	%------------------------------------------------------------------------------------------------------------------------
     	
         \subsubsection{Speed of Sound}
+	% Change back to heat capacity and look into calculating Cp using finite temperature differences with MBAR
+	% Can calculate covariances using something callable in MBAR, but it's not documented. Can also do with bootstrap
+	% and we know that's correct until we can validate the MBAR part. Can also use fluctuation calculations and bootstrap 
+	% which will probably be the absolute easiest, but te MBAR estimates of uncertainty won't be good
         The definition of the speed of sound is\cite{sos}:
         \begin{equation}c^2 = \left(\frac{\partial P}{\partial \rho}\right)_{S} = -\frac{V^2}{M}\left(\frac{\partial P}{\partial V}\right)_{S}\end{equation}
         
@@ -356,6 +363,7 @@ Definitions
     			\end{equation}
     		\end{itemize}
             \item GP models
+	    % Expand for our specific case. What precise cov matrices are we calculating?
             \begin{itemize}
             	\item Formalism for estimating some quantity $Z$ at
             	      unknown location $x_0$ ($Z\left(x_0\right)$) 
