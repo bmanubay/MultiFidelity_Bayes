@@ -28,11 +28,11 @@
 \usepackage{graphicx}
 \usepackage{dcolumn}
 \usepackage{boxedminipage}
-\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+%%\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage[]{microtype}
 \usepackage[obeyFinal]{todonotes}
 \usepackage{import}
-\usepackage{setspace, siunitx, amsmath,amsfonts, adjustbox,booktabs, cleveref}
+\usepackage{setspace, siunitx, amsmath,amsfonts, adjustbox,booktabs}%, cleveref}
 %\usepackage{caption}
 \usepackage{subcaption}
 \usepackage{enumitem}
@@ -80,11 +80,9 @@
 
 \graphicspath{{figures/}}
 \floatsetup[table]{capposition=top}
+%\usepackage[superscript,biblabel]{cite}
 \begin{document}
 
-%\documentclass[a4paper,12pt]{article}
-%\usepackage[superscript,biblabel]{cite}
-%\begin{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DOCUMENT
@@ -210,7 +208,7 @@ Definitions
         \begin{itemize}
         	\item Metamodeling has been critical in accelerating sampling driven processes which involve expensive calculations \cite{mbar}
         	\item Some previous work has utilized efficient metamodels to accelerate Bayesian infernence driven parameterization of LJ models with mixed results. \cite{LJexpBayes}
-    	    \item COFFE papers \cite{CoffeFull}    	    
+    	    \item COFFE papers \cite{COFFE2016}    	    
         \end{itemize}    
         \item What our ideas for parameterization are/paper overall thesis
         \begin{itemize}
@@ -307,13 +305,13 @@ Definitions
     	% and we know that's correct until we can validate the MBAR part. Can also use fluctuation calculations and bootstrap 
     	% which will probably be the absolute easiest, but te MBAR estimates of uncertainty won't be good
 
-        The definition of the enthalpy of vaporization is\cite{hvap}:
+        The definition of the enthalpy of vaporization is:
         \begin{equation}\Delta H_{vap} = H_{gas} - H_{liq} = E_{gas} - E_{liq} + P(V_{gas} - V_{liq})\end{equation}\\*
 	
     	The uncertainty in this calculation can be computed by bootstrapping or analytical estimation using MBAR. We will 
     	compare both results in order to determine whether the cheaper analytical estimate is accurate enough to be used.\\*  
 
-        An alternate, but similar, method for calculating the enthlapy of vaporization is recommended by Horn et al \cite{horn}.
+        An alternate, but similar, method for calculating the enthlapy of vaporization is recommended by Horn et al \cite{tip4pew}.
         \begin{equation}\Delta H_{vap} = -\frac{E_{liq, potential}}{N} + R T - P V_{liq} + C\end{equation}\\*
 
         In the above equation $C$ is a correction factor for vibrational energies, polarizability, non-ideality of the gas and pressure. It can be calculated as follows.
@@ -377,7 +375,9 @@ Definitions
                 	      samples to the estimation location, $x_0$
                 	\item They have a desegregating effect, to avoid
                 	      bias caused by sample clustering
-                \end{itemize}         
+                \end{itemize}
+                \item Formalizing expressions for my specific problem (which variables are which and what
+                      exactly do the covariances refer to).
             \end{itemize}
     	\end{itemize}
         \item \textbf{Hypothesis: With a multi-fidelity hierarchical observable calculation scheme, we can quickly approach the true forward model produced 
@@ -438,10 +438,14 @@ Definitions
         \item Results from 2D experiments with $[\#6X4:1]$
         \begin{itemize}
             \item Stability of solution (multiple starting points both in phase and out of phase)
+            \begin{itemize}
+                \item Marginal densities as a function of iteration
+                \item How similar do all of the final posteriors end up being?
+            \end{itemize}
             \item Simulation of properties using final distribution of parameters
         \end{itemize}
         \item Same results from 4D experiments with $[\#1:1]-[\#6X4]$ added
-        \item Scale up to all 5 SMIRKS
+        \item Scale up to all 5 SMIRKS (10-D parameter space)
 	%\begin{itemize}
 	%    \item Do we include MBAR?
 	%    \begin{itemize}
@@ -453,12 +457,11 @@ Definitions
 	%    	      there won't be fitting data
 	%    \end{itemize}        
 	%\end{itemize}
-    \item \textbf{Hypothesis: Different sampling algorithms will affect the speed of convergence to our final force field as well final distribution of parameters
-          sampled.}
-    \item Ideas for comparing force fields resultant from different sampling methods
+    %\item \textbf{Hypothesis: Different sampling algorithms will affect the speed of convergence to our final force field as well final distribution of parameters sampled.}
+    \item Ideas for comparing force fields (different start points) 
     % Robustness of parameter choices given a final posterior distribution
     \begin{itemize}
-    	\item KL divergence
+    	\item KL divergence (and one other probability convergence criteria if Josh has a recommendation)
     	\item Speed of convergence
     	\item Stability of solution (from different starting points do we get same answer?) 
     	\item Simulation of properties, using final parameters, that 
