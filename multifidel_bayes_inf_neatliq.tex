@@ -28,11 +28,11 @@
 \usepackage{graphicx}
 \usepackage{dcolumn}
 \usepackage{boxedminipage}
-\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+%%\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage[]{microtype}
 \usepackage[obeyFinal]{todonotes}
 \usepackage{import}
-\usepackage{setspace, siunitx, amsmath,amsfonts, adjustbox,booktabs, cleveref}
+\usepackage{setspace, siunitx, amsmath,amsfonts, adjustbox,booktabs}%, cleveref}
 %\usepackage{caption}
 \usepackage{subcaption}
 \usepackage{enumitem}
@@ -80,11 +80,9 @@
 
 \graphicspath{{figures/}}
 \floatsetup[table]{capposition=top}
+%\usepackage[superscript,biblabel]{cite}
 \begin{document}
 
-%\documentclass[a4paper,12pt]{article}
-%\usepackage[superscript,biblabel]{cite}
-%\begin{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DOCUMENT
@@ -209,14 +207,13 @@ Definitions
         \item Surrogate models/metamodels
         \begin{itemize}
         	\item Metamodeling has been critical in accelerating sampling driven processes which involve expensive calculations \cite{mbar}
-        	\item Need to include citations for the Bayes inference MD parameterization by the stats guys at ETH \cite{LJexpBayes}
-    	    \item COFFE papers \cite{CoffeFull}    	    
+        	\item Some previous work has utilized efficient metamodels to accelerate Bayesian infernence driven parameterization of LJ models with mixed results. \cite{LJexpBayes}
+    	    \item COFFE papers \cite{COFFE2016}    	    
         \end{itemize}    
         \item What our ideas for parameterization are/paper overall thesis
         \begin{itemize}
         	\item \textbf{Through systematically testing different multi-fidelity likelihood estimation workflows, we have found an optimal process which 
-        	      maximizes computational efficiency while yielding a force field nearly identical to that which would be produced
-        	      by a parameterization utilizing solely MD simulation for optimization.}
+        	      maximizes computational efficiency while yielding a force field consistent with the experimental data it was trained on.}
             \item How can we combine different techniques, to find reasonable force fields in medium dimensionality in a computationally efficient manner
             
         	%\item Full automation of finding likely parameter consistent
@@ -237,7 +234,7 @@ Definitions
 	\item What parameters?
 	\begin{itemize}
 		\item Non-bonded for cyclohexane and ethanol 
-		\item Since we're switching to neat organic parameterization, I'm going to add a few more molecules,
+		\item I'm going to add a few more molecules,
 		      but try to keep the number of parameters capped at 10 (chain alkanes, cyclic alcohols, etc.)
 		% Need to decide which molecules
 		\item 10
@@ -248,8 +245,8 @@ Definitions
 		\end{itemize}
 	\end{itemize}
     \item Property calculation
-    For this paper we will be optimizing our parameters on two thermophysical properties; molar volume, $\hat{V}$, and heat capacity
-    at constant pressure, $C_P$. This section details the methods we will use to calculate each.
+    For this paper we will be optimizing our parameters on two thermophysical properties; molar volume, $\hat{V}$, and heat of 
+    vaporization, $\Delta H_{vap}$. This section details the methods we will use to calculate each.
     % BCM: Comment out some of this because we're really only going to be calculating properites one way
     % BCM: may want to use molar volumes instead of densities so don't have to propogate simulation error to new property.
     %      Easier to propogate error in experiment and transform experimental property
@@ -303,80 +300,45 @@ Definitions
     	%MRS: Also, not clear it should go here because molar enthalpy isn't an experimental measurement.  OR explicitly mention it isn't an experimental quantity, BUT you need it for other quantites (like the enthalpy of mixing, and the heat capacity).
     	
     	%------------------------------------------------------------------------------------------------------------------------
-    	\subsubsection{Heat Capacity}
+    	\subsubsection{Heat of Vaporization}
     	% Can calculate covariances using something callable in MBAR, but it's not documented. Can also do with bootstrap
     	% and we know that's correct until we can validate the MBAR part. Can also use fluctuation calculations and bootstrap 
     	% which will probably be the absolute easiest, but te MBAR estimates of uncertainty won't be good
-    	The definition of the isobaric heat capacity is:
-    	\begin{equation}C_P = \left( \frac{\partial H}{\partial T}\right)_{P,N}\end{equation}
-    	%MRS: probably easier to take df/dbeta, and then take the temperature derivaive, which can be converted into a second beta derivative by a change of variable, so it's a 2nd derivative of f WRT beta, with some prefactors of beta.
-    	We will calculate this quantity in one of two ways. The first is simply by the fluctuations of enthalpy.
-    	$C_P$ can be calculated in this way as:
-    	\begin{equation} C_P = \frac{\langle H^2 \rangle - \langle H \rangle^2}{k_B T^2} \end{equation}
-    	Where $H$ is the molar enthalpy (calculated as $H = U + P*\hat{V}$), $k_B$ is Boltzmann's constant and T 
-    	is the system temperature.
-    	Uncertainty in this calculation is most accurately calculated using a simple bootstrapping procedure.
-    	%\begin{equation}C_P =  \frac{\partial \left(\frac{\partial f}{\partial \beta}\right)}{\partial T}_{P,N}\end{equation}
-    	%\begin{equation}C_P = k_B \beta^2 \frac{\partial^2 f}{\partial \beta^2}\end{equation}
-    	
-    	The second method for calculating $C_P$ is by approximating the thermodynamic definition using 
-    	finite differences:
-    	\begin{equation} C_P \approx \frac{1}{2 k_B \Delta T}\left(\frac{H(P,T+\Delta T)}{(T+\Delta T)^2} - \frac{H(P,T-\Delta T)}{(T-\Delta T)^2}\right) \end{equation}
-    	
+
+        The definition of the enthalpy of vaporization is:
+        \begin{equation}\Delta H_{vap} = H_{gas} - H_{liq} = E_{gas} - E_{liq} + P(V_{gas} - V_{liq})\end{equation}\\*
+	
     	The uncertainty in this calculation can be computed by bootstrapping or analytical estimation using MBAR. We will 
     	compare both results in order to determine whether the cheaper analytical estimate is accurate enough to be used.\\*  
-    	
-    	%The enthalpy fluctuation formula can also be used to calculate $C_P$\cite{horn}.
-    	%\begin{equation}C_P = \frac{\langle H^2 \rangle - \langle H \rangle^2}{N k_B \langle T \rangle^2}\end{equation}\\*
-    	
-    	%The form is equivalent for isochoric heat capacity, but with derivatives at constant volume rather than pressure.
-    	
-    	%\begin{equation}C_V = \left( \frac{\partial U}{\partial T}\right)_{V,N}\end{equation}
-    	
-    	%-----------------------------------------------------------------------------------------------------------------------
-        %\subsubsection{Speed of Sound}
-        %The definition of the speed of sound is\cite{sos}:
-        %\begin{equation}c^2 = \left(\frac{\partial P}{\partial \rho}\right)_{S} = -\frac{V^2}{M}\left(\frac{\partial P}{\partial V}\right)_{S}\end{equation}
-        
-        %MRS: I'd make the derivation more explicit, breakin down (dP/dV)_S -> in terms of the triple product rule, and then expressing it a a function of explicit deriatives, so it's clear what evaluations would be needed. 
-        
-        %\begin{equation}c^2 = \frac{V^2}{\beta M}\left[\frac{\left(\frac{\gamma_V}{k_B}\right)^2}{\frac{C_V}{k_B}} + \frac{\beta}{V \kappa_T}\right]\end{equation}\\*
-        
-        %Where:\\*
-        %\begin{equation}\gamma_V = \left(\frac{\partial P}{\partial T}\right)_{V}\end{equation}\\*
-        
-        %$\gamma_V$ is known as the isochoric pressure coefficient. $\kappa_T$ is the same isothermal compressibility from equation 20\\*
-        
-        %BCM: Did this derivation myself, pretty sure it's right
-        %An alternate derivation, applying the triple product rule to $\left(\frac{\partial P}{\partial V}\right)_{S}$ yields the following.
-        
-        %\begin{equation}\left(\frac{\partial P}{\partial V}\right)_{S} = \frac{\left(\frac{\partial S}{\partial V}\right)_{P}}{\left(\frac{\partial S}{\partial P}\right)_{V}}\end{equation}\\*
-        
-        %\begin{equation}\left(\frac{\partial S}{\partial V}\right)_{P} = \left(\frac{\partial S}{\partial T}\right)_{P} \left(\frac{\partial T}{\partial V}\right)_{P} = \frac{C_P}{T} \left(\frac{\partial T}{\partial V}\right)_{P} = \frac{C_P}{T V \alpha}\end{equation}\\*
-        
-        %Where $\alpha = \frac{1}{V} \left(\frac{\partial V}{\partial T}\right)_{P} = \left(\frac{\partial \ln V}{\partial T}\right)_{P}$ is the coefficient of thermal expansion. The second term in our triple product rule expansion, $\left(\frac{\partial S}{\partial P}\right)_{V}$, can be expressed as follows:
-        
-        %\begin{equation}\left(\frac{\partial S}{\partial P}\right)_{V} = \left(\frac{\partial S}{\partial T}\right)_{V} \left(\frac{\partial T}{\partial P}\right)_{V} = \frac{C_V}{T} \left(\frac{\partial T}{\partial P}\right)_{V} = \frac{C_V}{T \gamma_V}\end{equation}\\* 
-        
-        %Thus our derivation yields:
-        %\begin{equation}\left(\frac{\partial P}{\partial V}\right)_{S} = \frac{C_P \gamma_V}{C_V V \alpha}\end{equation}\\*
-        
-        %Horn et al set out several ways for calculating $\alpha$\cite{horn}:
-        
-        %\paragraph{Analytical derivative of density with respect to temperature}
-        %\begin{equation}\alpha = -\frac{d\ln\langle \rho \rangle}{dT}\end{equation}
-        
-        %\paragraph{Numerical derivative of density over range of T of interest}
-        %The same finite differnces approach as shown for isothermal compressibility can be applied here, thus:
-        %\begin{multline}
-        %\alpha = -\frac{d\ln\langle \rho \rangle}{dT} = \\ -\frac{1}{2\rho(T,P)} \left(\ln \langle \rho(P,T+\Delta T)\rangle - \ln \langle V(P,T-\Delta T)\right\rangle)\end{multline}
-        %\paragraph{Using the enthalpy-volume fluctuation formula}
-        %\begin{equation}\alpha = \frac{\langle VH \rangle - \langle V \rangle \langle H \rangle}{k_B \langle T \rangle^2 \langle V \rangle}\end{equation}\\*
-        
-        %Finite differences approximations and/or analytical derivation can also be used to calculate $\gamma_V$ or by note of the relation:
-        %\begin{equation}\gamma_V = - \frac{\alpha}{\kappa_T}\end{equation}\\*
-    	
-        %--------------------------------------------------------------------------------------------------------------------------
+
+        An alternate, but similar, method for calculating the enthlapy of vaporization is recommended by Horn et al \cite{tip4pew}.
+        \begin{equation}\Delta H_{vap} = -\frac{E_{liq, potential}}{N} + R T - P V_{liq} + C\end{equation}\\*
+
+        In the above equation $C$ is a correction factor for vibrational energies, polarizability, non-ideality of the gas and pressure. It can be calculated as follows.
+        \begin{multline}
+        C_{vib} = C_{vib,intra} + C_{vib,inter} \\ = \left(E_{vib,QM,gas,intra} - E_{vib,QM,liq,intra}\right) \\ + \left(E_{vib,QM,liq,inter} - E_{vib,CM,liq,inter}\right)
+        \end{multline}\\*
+
+        The $QM$ and $CM$ subscripts stand for quantum and classical mechanics, resectively. 
+        \begin{equation}C_{pol} = \frac{N}{2} \frac{\left(d_{gas} - d_{liq}\right)^2}{\alpha_{p,gas}}\end{equation}\\*
+
+        Where $d_i$ is the dipole moment of a molecule in phase $i$ and $\alpha_{p,gas}$ is the mean polarizability of a molecule in the gas phase.
+
+        \begin{equation}C_{ni} = P_{vap} \left(B - T \frac{dB}{dT}\right)\end{equation}\\*
+
+        Where $B$ is the second virial coefficient.
+
+        \begin{equation}C_x = \int_{P_{ext}}^{P_{vap}} \left[V\left(P_{ext}\right)\left[1 - \left(P - P_{ext}\right) \kappa_T\right] - T V \alpha\right] dP\end{equation}\\*
+
+        Where $P_{ext}$ is the external pressure and $V\left(P_{ext}\right)$ is the volume at $P_{ext}$. 
+
+        This is frequently done as a single simulation calculation by assuming
+        the average intramolecular energy remains constant during the phase
+        change, which is rigorously correct for something like a rigid water
+        molecule (intramolecular energies are zero), but less true for
+        something with structural rearrangement between gas and liquid phases. 
+
+       %--------------------------------------------------------------------------------------------------------------------------
         
     \end{itemize}
     \item Methods for metamodeling
@@ -384,21 +346,7 @@ Definitions
     	\item MBAR
     	\item Surrogate models
     	\begin{itemize}
-%    		\item Physically motivated models
-%    		\begin{itemize}
-%    			\item Density
-%    			\begin{equation}
-%    			\frac{D_{new}}{D_{old}} = \frac{{\sum_i \sum_{j \neq i} N_i N_j \left(\sigma_i \sigma_j \right)^{\frac{3}{2}}}_{new}}{{\sum_i \sum_{j \neq i} N_i N_j \left(\sigma_i \sigma_j \right)^{\frac{3}{2}}}_{old}}
-%    			\end{equation}
-%    			\item Enthalpy
-%    			\begin{equation}
-%    			\frac{H_{new}}{H_{old}} = \frac{{\sum_i \sum_{j \neq i} N_i N_j \left(\epsilon_i \epsilon_j \right)^{\frac{1}{2}}}_{new}}{{\sum_i \sum_{j \neq i} N_i N_j \left(\epsilon_i \epsilon_j \right)^{\frac{1}{2}}}_{old}}
-    			% Rich pair-correlation function https://www.researchgate.net/profile/Richard_Messerly2
-    			% SAFT (look into) http://pubs.acs.org/doi/abs/10.1021/ie0102201
-    			% Reith papers again
-    			% Cite how they differ
-%    			\end{equation}
-%    		\end{itemize}
+
             \item GP models
             % Expand for our specific case. What precise cov matrices are we calculating?
             \begin{itemize}
@@ -427,7 +375,9 @@ Definitions
                 	      samples to the estimation location, $x_0$
                 	\item They have a desegregating effect, to avoid
                 	      bias caused by sample clustering
-                \end{itemize}         
+                \end{itemize}
+                \item Formalizing expressions for my specific problem (which variables are which and what
+                      exactly do the covariances refer to).
             \end{itemize}
     	\end{itemize}
         \item \textbf{Hypothesis: With a multi-fidelity hierarchical observable calculation scheme, we can quickly approach the true forward model produced 
@@ -449,31 +399,20 @@ Definitions
         		% Constraints on proposal for using GP in order to keep from moving into regions of high uncertainty
         		\end{itemize}
         	\end{itemize}
-            \item Using MBAR as a look up table (2 levels of property estimation)
-            \begin{itemize}
-            	\item High fidelity: Full MD simulation at a single point in parameter space
-            	\item Medium fidelity: Use MBAR to estimate properties over a conservative range of parameter space in order to create a hypervolume of data
-            	\begin{itemize}
-            		\item Rather than attempting to fit a model we can use MBAR discrete MBAR calculated observables in order to evaluate our likelihood
-            		\item Using a discrete set of calculations, we can iterate over those values in order to find the highest point of probability and then 
-            		      perform a new simulation and repeat the process
-            		\item As we narrow in on the region of highest probability density, we can refine the grid over which we're searching in order to more
-            		      accurately represent the final posterior
-            % Could be useful in low dimensionality and to start with
-            	\end{itemize}
-            \end{itemize}
+%            \item Using MBAR as a look up table (2 levels of property estimation)
+%            \begin{itemize}
+%            	\item High fidelity: Full MD simulation at a single point in parameter space
+%            	\item Medium fidelity: Use MBAR to estimate properties over a conservative range of parameter space in order to create a hypervolume of data
+%            	\begin{itemize}
+%            		\item Rather than attempting to fit a model we can use MBAR discrete MBAR calculated observables in order to evaluate our likelihood
+%            		\item Using a discrete set of calculations, we can iterate over those values in order to find the highest point of probability and then 
+%            		      perform a new simulation and repeat the process
+%            		\item As we narrow in on the region of highest probability density, we can refine the grid over which we're searching in order to more
+%            		      accurately represent the final posterior
+%            % Could be useful in low dimensionality and to start with
+%            	\end{itemize}
+%            \end{itemize}
         \end{itemize}
-        %\item Construction of "gold standard" posterior distribution of force field parameters
-        %\begin{itemize}
-        %	\item Will need to brainstorm best way to go about doing this
-        %	\item In theory, we could construct a posterior with purely simulation, but it would take so much resource time
-        %	\item Might be a better idea to compare differences in the cheap posteriors we produce 
-        	% Might need even to do this yet
-        % Ideally we get to same minima every time
-        % Multiple minima: some of the methods Rich developed could be useful for this 
-        % Bias vs. uncertainty trade-off
-        
-        %\end{itemize}              
     \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Validating accuracy of MBAR calculations for constructing GP models
@@ -496,6 +435,17 @@ Definitions
 	      speed up over a traditional inference approach with purely simulation used in the likelihood estimate, but 
 	      will also result in a final force field with accuracy rivaling that of the expensive approach.}
 	\item Experiments for testing sampling workflow
+        \item Results from 2D experiments with $[\#6X4:1]$
+        \begin{itemize}
+            \item Stability of solution (multiple starting points both in phase and out of phase)
+            \begin{itemize}
+                \item Marginal densities as a function of iteration
+                \item How similar do all of the final posteriors end up being?
+            \end{itemize}
+            \item Simulation of properties using final distribution of parameters
+        \end{itemize}
+        \item Same results from 4D experiments with $[\#1:1]-[\#6X4]$ added
+        \item Scale up to all 5 SMIRKS (10-D parameter space)
 	%\begin{itemize}
 	%    \item Do we include MBAR?
 	%    \begin{itemize}
@@ -507,12 +457,11 @@ Definitions
 	%    	      there won't be fitting data
 	%    \end{itemize}        
 	%\end{itemize}
-    \item \textbf{Hypothesis: Different sampling algorithms will affect the speed of convergence to our final force field as well final distribution of parameters
-          sampled.}
-    \item Ideas for comparing force fields resultant from different sampling methods
+    %\item \textbf{Hypothesis: Different sampling algorithms will affect the speed of convergence to our final force field as well final distribution of parameters sampled.}
+    \item Ideas for comparing force fields (different start points) 
     % Robustness of parameter choices given a final posterior distribution
     \begin{itemize}
-    	\item KL divergence
+    	\item KL divergence (and one other probability convergence criteria if Josh has a recommendation)
     	\item Speed of convergence
     	\item Stability of solution (from different starting points do we get same answer?) 
     	\item Simulation of properties, using final parameters, that 
