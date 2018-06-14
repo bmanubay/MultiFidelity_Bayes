@@ -244,7 +244,7 @@ Definitions
         	\item \textbf{Through systematically testing different multi-fidelity likelihood
                   estimation workflows, we have found an optimal process which 
         	      maximizes computational efficiency while yielding a force field consistent 
-                  with the experimental data it was trained on.}
+                  with the experimental data it was trained on.} % Not optimal, just better, it's way faster and robust 
             \item How can we combine different techniques, to find reasonable force fields 
                   in medium dimensionality in a computationally efficient manner
         \end{itemize}
@@ -263,7 +263,9 @@ Definitions
 	\item Simulation protocol
 	\item What parameters?
 	\begin{itemize}
-		\item Non-bonded for cyclohexane and ethanol 
+		\item Non-bonded for cyclohexane and ethanol %cyclopropane? What other molecules could add? Brainstorm list fitting
+		                                             % SMIRKS we have. When we do the 10 dimension test we'll have to add more 
+							     % molecules to avoid overfitting.
 		%\item I'm going to add a few more molecules,
 		%      but try to keep the number of parameters capped at 10 (chain alkanes, cyclic alcohols, etc.)
 		% Need to decide which molecules
@@ -414,20 +416,20 @@ Definitions
 \begin{itemize}
 	\item \textbf{Hypothesis: Using a multi-fidelity likelihood calculation scheme described in the previous section will provide not only a substantial
 	      speed up over a traditional inference approach with purely simulation used in the likelihood estimate, but 
-	      will also result in a final force field with accuracy rivaling that of the expensive approach.}
+	      will also result in statistically equivalent final force field.}
 	\item Experiments for testing sampling workflow
         \item Results from 2D experiments with $[\#6X4:1]$
         \begin{itemize}
-            \item Stability of solution (multiple starting points)
+            \item Stability of solution (multiple starting points) %using final process
             \begin{itemize}
                 \item Maybe also consider does starting out of liquid phase break the process 
             \end{itemize}
-            \item How similar do all of the final posteriors end up being
+            \item How similar do all of the final posteriors end up being %Determine a way to measure closeness
             \item Simulation of properties using final distribution of parameters
             \item How does sparsity of MBAR calculations in GP models affect final posterior?
             \begin{itemize}
                 \item Start with gradient information (2 $\times$ dimensionality + 1) and move up
-                      from there.
+                      from there. %Add in all correlation effects because it won't be that expensive. Discussion of higher dimension correlation further out
                 \item What is the most dense the calculations should be and how many factor
                       levels should be tested (this may require some trial-and-error to sort)?
             \end{itemize}
@@ -468,7 +470,7 @@ Definitions
                       32.1 and 2.0 \% of the \textit{smirnoff99Frosst} values, respectively.
             \end{itemize}
             \item Given results from variance analyses over all 5 SMIRKS/atom types, I think
-                  maximum changes of 20 \% of the $\epsilon$ and 5 \% of the r$_{min,half}$ in 
+                  maximum changes of 25 \% of the $\epsilon$ and 5 \% of the r$_{min,half}$ in 
                   \textit{smirnoff99Frosst} would be appropriate for the stability tests.
         \end{itemize}
     \item Ideas for comparing force fields (different start points) 
@@ -493,11 +495,12 @@ Definitions
             \item Total wall time
         \end{itemize} 
     	\item Simulation of properties, using final parameters, that 
-    	      were not in training set
+    	      were not in training set % Let's do same properties different molecules outside of training set
+	                               % Maybe also add different temperatures for training 
     	\begin{itemize}
     		\item 3-fold verification
     		\begin{itemize}
-    			\item Different properties not in training set
+    			%\item Different properties not in training set
     			\item Extrapolation to thermodynamic state outside of training set (T, P)
     			\item Other molecules outside of training set that have the same SMIRKS types
     		\end{itemize}    		
