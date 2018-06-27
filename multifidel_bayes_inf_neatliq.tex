@@ -28,11 +28,20 @@
 \usepackage{graphicx}
 \usepackage{dcolumn}
 \usepackage{boxedminipage}
-%%\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+ 
+\urlstyle{same}
+
 \usepackage[]{microtype}
 \usepackage[obeyFinal]{todonotes}
 \usepackage{import}
-\usepackage{setspace, siunitx, amsmath,amsfonts, adjustbox,booktabs}%, cleveref}
+\usepackage{setspace, siunitx, amsmath,amsfonts, adjustbox,booktabs,cleveref}
 %\usepackage{caption}
 \usepackage{subcaption}
 \usepackage{enumitem}
@@ -146,83 +155,104 @@ Definitions
 	%MD would be great, but FF issues
 	%Huge amount of work to get protein relatively correct
 	\begin{itemize}
-		\item Force fields that are transferable and quantitatively accurate are necessary for molecular simulation to be useful. \cite{villin,villin2,drug_discov}
+		\item Force fields that are transferable and quantitatively accurate are necessary 
+              for molecular simulation to be useful. \cite{villin,villin2,drug_discov}
 	\end{itemize}
     \item Transferability and inaccuracy issues
     \begin{itemize}
-    	\item Transferability of MD force fields, and particularly sets of force field parameters, is a current limitation 
+    	\item Transferability of MD force fields, and particularly sets of force field
+              parameters, is a current limitation 
     	      in the molecular simulation field.\cite{transferability1,transferability2,
     	      transferability3,transferability4}  
-        \item Inaccurate and poorly parameterized force fields have been shown to grossly misrepresent molecular systems.
+        \item Inaccurate and poorly parameterized force fields have been shown to grossly
+              misrepresent molecular systems.
               \cite{ffcomp1,ffcomp2,robustness} 
-        \item It has been shown that depending on the choice of force field, the same experiments for the same or similar systems can produce quantitatively
-              different results, making the choice of force field far more important than it should be. \cite{ffcomp1,ffcomp2,ewen_comparison_2016,petrov_are_2014,guvench_comparison_2008}\\
+        \item It has been shown that depending on the choice of force field, the same 
+              experiments for the same or similar systems can produce quantitatively
+              different results, making the choice of force field far more important than it 
+              should be. \cite{ffcomp1,ffcomp2,ewen_comparison_2016,petrov_are_2014,
+              guvench_comparison_2008}\\
     \end{itemize}
 	\item Parameterization efforts
 	\begin{itemize}
 		\item Early 
 		\begin{itemize}
-			\item Until very recently, force fields have been parameterized manually, guided by the intuition of expert computational
-			      chemists.\cite{parm94,tip3p,burger,law,combined,rational,aipar,charmm1,charmm2,mm1,mm2,mmff}
-			\item Despite attempts at improvement, many of the functional forms and parameters of popular force fields remain mostly 
-			      unchanged due to the lack of clear, systematic methods for updating them.\cite{unchanged,monticelli}
-			\item Force fields like AMBER \textit{parm94} showed intuitive departure by shrinking parameter space with clever atom typing 
-			      defined by expert computational chemists.\cite{parm94}
+			\item Until very recently, force fields have been parameterized manually, 
+                  guided by the intuition of expert computational chemists.\cite{parm94,
+                  burger,law,combined,rational,aipar,charmm1,charmm2,mm1,mm2,mmff}
+			\item Despite attempts at improvement, many of the functional forms and 
+                  parameters of popular force fields remain mostly unchanged due to 
+                  the lack of clear, systematic methods for updating
+                  them.\cite{unchanged,monticelli}
+			\item Force fields like AMBER \textit{parm94} showed intuitive departure 
+                  by shrinking parameter space with clever atom type 
+                  defined by expert computational chemists.\cite{parm94}
 		\end{itemize}
 	    \item Second Gen
 	    \begin{itemize}
 		    \item The parameterization of GAFF used a semi-automated genetic algorithm approach 
 		          to select parameters.\cite{amber}
-		    \item The parameterization of the rigid Tip4p-Ew model utilized a unique gradient assisted method. \cite{tip4pew}
-		    \item An incredible amount of work over a long period of time has still been necessary to get biomolecular force fields somewhat
+		    \item The parameterization of the rigid Tip4p-Ew model utilized a unique gradient
+                  assisted method. \cite{tip4pew}
+		    \item An incredible amount of work over a long period of time has still been
+                  necessary to get biomolecular force fields somewhat
 		          correct.\cite{GROMOS53A5}
 	    \end{itemize}
         \item Current efforts
         \begin{itemize}
-        	\item A few notable attempts, such as GAAMP and ForceBalance, have been made in recent years towards the 
-        	      development of more automated and systematic force field parameterization methods.\cite{GAAMP,FB1,FB2,FB3} 
-        	\item Each made important contributions to automated force field parameterization through clever use of objective function 
-        	      optimization, exploiting a variety of fitting data and allowing exploration of functional forms. 
-        	%\item Even with these more sophisticated
-        	%optimization schemes human intervention is required to assign weights to different kinds of data when they are included 
-        	%in the same objective function. 
-        	%\item Additionally, molecular systems aren't necessarily uniquely defined by a single parameter set.
-            %\item Something about parameter typing with SMIRKS
+        	\item A few notable attempts, such as GAAMP and ForceBalance, have been made 
+                  in recent years towards the 
+        	      development of more automated and systematic force field parameterization
+                  methods.\cite{GAAMP,FB1,FB2,FB3} 
+        	\item Each made important contributions to automated force field parameterization
+                  through clever use of objective function 
+        	      optimization, exploiting a variety of fitting data and allowing exploration 
+                  of functional forms. 
         \end{itemize}
     \end{itemize}
     \item Bayesian parameterization
     \begin{itemize}
     	\item Previous uses
     	\begin{itemize}
-    		\item Bayesian inference provides a robust statistical framework for force field parameterization. 
-    		      It has been shown that Bayesian approaches can be applied to a wide variety of data driven sciences.
+    		\item Bayesian inference provides a robust statistical framework for force 
+                  field parameterization. It has been shown that Bayesian approaches 
+                  can be applied to a wide variety of data driven sciences.
     		      \cite{bayes1,bayes2,bayes3,bayes5,bayes6,bayes7,bayes8,bayes_coarse} 
     		%\item Bayesian methods have been used for balancing data to help minimize influence of oversampled populations and generate more robust predictive   
     		%      models\cite{bayes2} to recalibrating initial force estimates in coarse grained MD models to target atomistic MD and experimental data
     		%      \cite{bayes_coarse,bayes1}. 
-    		\item Bayesian inference methods have also been applied for uncertainty quantification in MD as well as limited parameterization
+    		\item Bayesian inference methods have also been applied for uncertainty 
+                  quantification in MD as well as limited parameterization
     		      problems on simple Lennard-Jones systems. \cite{bayes4,UQMDrizzi,LJexpBayes}
     		% See if i can cite that unpublished MD UQ chapter from NIST
     	\end{itemize}
         \item Surrogate models/metamodels
         \begin{itemize}
-        	\item Metamodeling has been critical in accelerating sampling driven processes which involve expensive calculations \cite{mbar}
-        	\item Some previous work has utilized efficient metamodels to accelerate Bayesian infernence driven parameterization of LJ models with mixed results. \cite{LJexpBayes}
-    	    \item COFFE papers \cite{COFFE2016}    	    
+            \item Parameterization on purely expensive simulator calculations (either MD or QM)
+                  is extremely expensive
+        	\item Metamodeling has been critical in accelerating sampling driven processes 
+                  which involve expensive calculations \cite{mbar}
+        	\item Some previous work has utilized efficient metamodels to accelerate Bayesian
+                  inference driven parameterization of LJ models with mixed results. Statistical
+                  and modeling methods were great, but the physical intuition to constrain the 
+                  problem correctly was lacking. \cite{LJexpBayes}
+    	    \item COFFE papers --> innovative metamodeling and sparse grid optimization 
+                  techniques \cite{COFFE2016}    	    
         \end{itemize}    
         \item What our ideas for parameterization are/paper overall thesis
         \begin{itemize}
-        	\item \textbf{Through systematically testing different multi-fidelity likelihood estimation workflows, we have found an optimal process which 
-        	      maximizes computational efficiency while yielding a force field consistent with the experimental data it was trained on.}
-            \item How can we combine different techniques, to find reasonable force fields in medium dimensionality in a computationally efficient manner
-            
-        	%\item Full automation of finding likely parameter consistent
-        	%      with a set of experimental data
-        	%\item Exploration and quantitative comparison of model forms
-        	%      and mixing rules 
-        	%\item Systematic error quantification
-        	%\item INSERT SCHEMATIC DIAGRAM
-        \end{itemize}    
+        	\item \textbf{Through systematically testing different multi-fidelity likelihood
+                  estimation workflows, we have found an optimal process which 
+        	      maximizes computational efficiency while yielding a force field consistent 
+                  with the experimental data it was trained on.} % Not optimal, just better, it's way faster and robust 
+            \item How can we combine different techniques, to find reasonable force fields 
+                  in medium dimensionality in a computationally efficient manner
+        \end{itemize}
+        \item Additional ideas for motivating what we're doing:
+        \begin{itemize}
+            \item How many person-years does it typically take to create new force fields and
+                  how much of that is limited by the expense of the optimization process?
+        \end{itemize}
     \end{itemize}
 \end{itemize}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -233,9 +263,11 @@ Definitions
 	\item Simulation protocol
 	\item What parameters?
 	\begin{itemize}
-		\item Non-bonded for cyclohexane and ethanol 
-		\item I'm going to add a few more molecules,
-		      but try to keep the number of parameters capped at 10 (chain alkanes, cyclic alcohols, etc.)
+		\item Non-bonded for cyclohexane and ethanol %cyclopropane? What other molecules could add? Brainstorm list fitting
+		                                             % SMIRKS we have. When we do the 10 dimension test we'll have to add more 
+							     % molecules to avoid overfitting.
+		%\item I'm going to add a few more molecules,
+		%      but try to keep the number of parameters capped at 10 (chain alkanes, cyclic alcohols, etc.)
 		% Need to decide which molecules
 		\item 10
 		\item Specific SMIRKS:
@@ -245,59 +277,25 @@ Definitions
 		\end{itemize}
 	\end{itemize}
     \item Property calculation
-    For this paper we will be optimizing our parameters on two thermophysical properties; molar volume, $\hat{V}$, and heat of 
-    vaporization, $\Delta H_{vap}$. This section details the methods we will use to calculate each.
+    \begin{itemize}
+        \item For this paper we will be optimizing our parameters on two thermophysical
+              properties; molar volume, $\hat{V}$, and heat of 
+              vaporization, $\Delta H_{vap}$. This section details the methods we will use to
+              calculate each.
     % BCM: Comment out some of this because we're really only going to be calculating properites one way
     % BCM: may want to use molar volumes instead of densities so don't have to propogate simulation error to new property.
     %      Easier to propogate error in experiment and transform experimental property
-    \begin{itemize}
-    	\item Molar Volume
-    	System volume, $V$, can easily be calculated as:
-    	\begin{equation} V = x /times y /times z \end{equation}
-    	where $x$, $y$ and $z$ are the edge lengths of the simulation.
-    	This can be converted to a molar volume by dividing by the number of moles in the periodic box. We can write molar
-    	volume as:
-    	\begin{equation} \hat{V} = \frac{V}{N_{mol}} = \frac{V \times N_{Av}}{N_{part}} \end{equation}
-    	Where $N_{mol}$ are the number of moles per box, $N_{part}$ are the number of particles per box and $N_{Av}$ 
-    	is Avogadro's number.
-    	%\item Densities
-    	%Starting with the equation used to calculate the density experimentally, 
-    	%\begin{equation} \rho = \frac{M}{V} \end{equation}
-    	%We replace the average with the esemble estimate (calculated either directly, or with reweighting) to obtain: 
-    	%\begin{equation} \rho = \frac{M}{\langle V \rangle} \end{equation}
-    	%\paragraph{Derivative Estimate}
-    	%From the differential definition of the Gibbs free energy $dG = VdP -SdT + \sum_i \mu_i dN_i$ that V can be calculated from %the Gibbs free energy as:
-    	%\begin{equation} V = \left( \frac{\partial G}{\partial P} \right)_{T,N} \end{equation}
-    	%The density can therefore be estimated from the Gibbs free energy.
-    	%\begin{equation} \rho = \frac{M}{ \left( \frac{\partial G}{\partial P} \right)_{T,N}} \end{equation}
-    	%The derivative can be estimated using a central difference numerical method utilizing Gibbs 
-    	%free energies \\ reweighted to different pressures.
-    	%\begin{equation} \left( \frac{\partial G}{\partial P} \right)_{T,N} \approx \frac{G_{P + \Delta P} - G_{P-\Delta P}}{2\Delta p} \end{equation}
-    	%The density can then finally be estimated.
-    	%MRS: I changed a lot of the lower case p's for pressure to upper case P's to use more standard symbols -- you should review and correct the rest.
-    	%\begin{equation} \rho \approx \frac{M}{\frac{G_{P + \Delta P} - G_{P-\Delta P}}{2\Delta P}} \end{equation}
-    	%This can be calculated from the reduced free energy $f$ if desired by simply substituting:
-    	%\begin{equation} \rho \approx \frac{\beta M}{\frac{f_{P + \Delta P} - f_{P-\Delta P}}{2\Delta P}} \end{equation}
-    	
-    	%\subsubsection{Molar Enthalpy}
-    	%This section is on the relation of enthalpy to Gibbs free energy (should we need it). This is not an experimental quantity, but will be helpful in calculating related properties of interest. The enthalpy, $H$, can be found from the Gibbs free energy, $G$, by the Gibbs-Helmholtz relation: 
-    	
-    	%\begin{equation}H=-T^2 \left(\frac{\partial \big(\frac{G}{T}\big)}{\partial T}\right)_{P,N}\end{equation}
-    	
-    	%Transforming the derivative in the Gibbs-Helmholtz relation to be in terms of $\beta$ instead of $T$ yields:
-    	
-    	%\begin{equation}H=-T^2  \frac{\beta^2}{\beta^2}\left(\frac{\partial \big(\frac{G}{T}\big)}{\partial T} \frac{\partial T}{\partial \beta} \frac{\partial \beta}{\partial T}\right)_{P,N}\end{equation}
-    	
-    	
-    	%Recall that $\beta = \frac{1}{k_B T}$, therefore $\frac{\partial \beta}{\partial T} = - \frac{1}{k_B T^2}$. Substituting these values into the enthalpy equation gives:
-    	
-    	%MRS: usually, you should just use \left( instead of \big(, since it will choose the correct size for you! 
-    	%\begin{multline}
-    	%H = \frac{1}{k_B^3 T^2 \beta^2} \left(\frac{\partial \big(\frac{G}{T}\big)}{\partial \beta}\right)_{P,N}  = \frac{1}{k_B} \left(\frac{\partial \big(\frac{G}{T}\big)}{\beta}\right)_{P,N} = \frac{\partial f}{\partial \beta}_{P,N} 
-    	%\end{multline}\\*
-    	%MRS: I like this equation more, as it's hard to take finite differences of $G$ (as discussed above).  Then you can eliminate the last few lines.
-    	
-    	%MRS: Also, not clear it should go here because molar enthalpy isn't an experimental measurement.  OR explicitly mention it isn't an experimental quantity, BUT you need it for other quantites (like the enthalpy of mixing, and the heat capacity).
+        \begin{itemize}
+    	    \item Molar Volume \\*
+    	    System volume, $V$, can easily be calculated as:
+    	    \begin{equation} V = x \times y \times z \end{equation}
+    	    where $x$, $y$ and $z$ are the edge lengths of the simulation.
+    	    This can be converted to a molar volume by dividing by the number of moles in the     
+            periodic box. We can write molar volume as:
+    	    \begin{equation} \hat{V} = \frac{V}{N_{mol}} = \frac{V \times N_{Av}}{N_{part}}                   \end{equation}
+    	    Where $N_{mol}$ are the number of moles per box, $N_{part}$ are the number of        
+            particles per box and $N_{Av}$ 
+    	    is Avogadro's number.
     	
     	%------------------------------------------------------------------------------------------------------------------------
     	\subsubsection{Heat of Vaporization}
@@ -308,38 +306,12 @@ Definitions
         The definition of the enthalpy of vaporization is:
         \begin{equation}\Delta H_{vap} = H_{gas} - H_{liq} = E_{gas} - E_{liq} + P(V_{gas} - V_{liq})\end{equation}\\*
 	
-    	The uncertainty in this calculation can be computed by bootstrapping or analytical estimation using MBAR. We will 
-    	compare both results in order to determine whether the cheaper analytical estimate is accurate enough to be used.\\*  
-
-        An alternate, but similar, method for calculating the enthlapy of vaporization is recommended by Horn et al \cite{tip4pew}.
-        \begin{equation}\Delta H_{vap} = -\frac{E_{liq, potential}}{N} + R T - P V_{liq} + C\end{equation}\\*
-
-        In the above equation $C$ is a correction factor for vibrational energies, polarizability, non-ideality of the gas and pressure. It can be calculated as follows.
-        \begin{multline}
-        C_{vib} = C_{vib,intra} + C_{vib,inter} \\ = \left(E_{vib,QM,gas,intra} - E_{vib,QM,liq,intra}\right) \\ + \left(E_{vib,QM,liq,inter} - E_{vib,CM,liq,inter}\right)
-        \end{multline}\\*
-
-        The $QM$ and $CM$ subscripts stand for quantum and classical mechanics, resectively. 
-        \begin{equation}C_{pol} = \frac{N}{2} \frac{\left(d_{gas} - d_{liq}\right)^2}{\alpha_{p,gas}}\end{equation}\\*
-
-        Where $d_i$ is the dipole moment of a molecule in phase $i$ and $\alpha_{p,gas}$ is the mean polarizability of a molecule in the gas phase.
-
-        \begin{equation}C_{ni} = P_{vap} \left(B - T \frac{dB}{dT}\right)\end{equation}\\*
-
-        Where $B$ is the second virial coefficient.
-
-        \begin{equation}C_x = \int_{P_{ext}}^{P_{vap}} \left[V\left(P_{ext}\right)\left[1 - \left(P - P_{ext}\right) \kappa_T\right] - T V \alpha\right] dP\end{equation}\\*
-
-        Where $P_{ext}$ is the external pressure and $V\left(P_{ext}\right)$ is the volume at $P_{ext}$. 
-
-        This is frequently done as a single simulation calculation by assuming
-        the average intramolecular energy remains constant during the phase
-        change, which is rigorously correct for something like a rigid water
-        molecule (intramolecular energies are zero), but less true for
-        something with structural rearrangement between gas and liquid phases. 
+    	The uncertainty in this calculation can be computed by bootstrapping or analytical
+        estimation using MBAR. We will compare both results in order to determine whether 
+        the cheaper analytical estimate is accurate enough to be used.\\*  
 
        %--------------------------------------------------------------------------------------------------------------------------
-        
+        \end{itemize}
     \end{itemize}
     \item Methods for metamodeling
     \begin{itemize}
@@ -358,14 +330,18 @@ Definitions
                 \item \begin{equation} \hat{Z}\left(x_0\right) =
                       \sum_{i=1}^N w_i\left(x_0\right) \times
                       Z\left(x_i\right) \end{equation}
-                \item We find our weight matrix, \textbf{W}, by minimizing \textbf{W} subject to the following system of equations:
+                \item We find our weight matrix, \textbf{W}, by minimizing \textbf{W} subject 
+                      to the following system of equations:
                 \begin{itemize}
                 	\item \begin{align}
                 	&\underset{W}{\text{minimize}}& & W^T \cdot \operatorname{Var}_{x_i} \cdot W - \operatorname{Cov}_{x_ix_0}^T \cdot W - W^T \cdot \operatorname{Cov}_{x_ix_0} + \operatorname{Var}_{x_0} \\
                 	&\text{subject to}
                 	& &\mathbf{1}^T \cdot W = 1
                 	\end{align}
-                	\item where the literals \begin{equation}\left\{\operatorname{Var}_{x_i}, \operatorname{Var}_{x_0}, \operatorname{Cov}_{x_ix_0}\right\}\end{equation} stand for \begin{equation}
+                	\item where the literals \begin{equation}\left\{\operatorname{Var}_{x_i},
+                          \operatorname{Var}_{x_0},                    
+                          \operatorname{Cov}_{x_ix_0}\right\}\end{equation} stand for
+                          \begin{equation}
                 	\left\{\operatorname{Var}\left(\begin{bmatrix}Z(x_1)&\cdots&Z(x_N)\end{bmatrix}^T\right), \operatorname{Var}(Z(x_0)), \operatorname{Cov} \left(\begin{bmatrix}Z(x_1)&\cdots&Z(x_N)\end{bmatrix}^T,Z(x_0)\right)\right\}\end{equation}
                 \end{itemize}
                 \item The weights summarize important procedures of the 
@@ -376,29 +352,36 @@ Definitions
                 	\item They have a desegregating effect, to avoid
                 	      bias caused by sample clustering
                 \end{itemize}
-                \item Formalizing expressions for my specific problem (which variables are which and what
-                      exactly do the covariances refer to).
+                \item Formalizing expressions for my specific problem (which variables are which
+                      and what exactly do the covariances refer to).
             \end{itemize}
     	\end{itemize}
-        \item \textbf{Hypothesis: With a multi-fidelity hierarchical observable calculation scheme, we can quickly approach the true forward model produced 
-        	          by MD simulation}
-          % Rework hypothesis: With hierarchical modeling we can quickly approach the true forward model produced by simulation
-          
+        \item \textbf{Hypothesis: With a multi-fidelity hierarchical observable calculation
+               scheme, we can quickly approach the true forward model produced 
+        	   by MD simulation}
         \item Explanation of potential multi-fidelity posterior sampling algorithms:
         \begin{itemize}
         	\item 3 Levels of property calculation
         	\begin{itemize}
         		\item High fidelity: Full MD simulation at a single point in parameter space
-        		\item Medium fidelity: Use MBAR to estimate properties over a conservative range of parameter space in order to create a hypervolume of data
-        		      over which we can construct a model
-        		\item Low fidelity: Use data from medium fidelity calculations in order to fit a regression model over a hypervolume of parameter space
+        		\item Medium fidelity: Use MBAR to estimate properties over a conservative 
+                      range of parameter space in order to create a hypervolume of data
+        		      over which we can construct a model.
+        		\item Low fidelity: Use data from medium fidelity calculations in order to fit
+                      a regression model over a hypervolume of parameter space
         		\begin{itemize}
-        			\item For right now, most plausible technique is GP regression, but could brainstorm some others
-        		% Could just do this
-        		% What do marginals around maxima look like as a function of iteration
-        		% Constraints on proposal for using GP in order to keep from moving into regions of high uncertainty
+        			\item For right now, most plausible technique is GP regression, but 
+                          could brainstorm some others
         		\end{itemize}
-        	\end{itemize}
+            \end{itemize}    
+            \item Sampling from our posterior using GP regression will rapidly lead us to a new 
+                  optima in the local parameter space that we have modeled.
+            \item We can directly sample configurations at this new optima using MD and 
+                  repeat the hierarchical property calculation and sampling using GP
+                  models in order to "learn" the functional form of the properties
+                  across parameter space.
+            \item We arrive in the high probability region of our parameters cheaply and can 
+                  finish sampling using the high fidelity calculation method. 
 %            \item Using MBAR as a look up table (2 levels of property estimation)
 %            \begin{itemize}
 %            	\item High fidelity: Full MD simulation at a single point in parameter space
@@ -433,43 +416,91 @@ Definitions
 \begin{itemize}
 	\item \textbf{Hypothesis: Using a multi-fidelity likelihood calculation scheme described in the previous section will provide not only a substantial
 	      speed up over a traditional inference approach with purely simulation used in the likelihood estimate, but 
-	      will also result in a final force field with accuracy rivaling that of the expensive approach.}
+	      will also result in statistically equivalent final force field.}
 	\item Experiments for testing sampling workflow
         \item Results from 2D experiments with $[\#6X4:1]$
         \begin{itemize}
-            \item Stability of solution (multiple starting points both in phase and out of phase)
+            \item Stability of solution (multiple starting points) %using final process
             \begin{itemize}
-                \item Marginal densities as a function of iteration
-                \item How similar do all of the final posteriors end up being?
+                \item Maybe also consider does starting out of liquid phase break the process 
             \end{itemize}
+            \item How similar do all of the final posteriors end up being %Determine a way to measure closeness
             \item Simulation of properties using final distribution of parameters
-        \end{itemize}
+            \item How does sparsity of MBAR calculations in GP models affect final posterior?
+            \begin{itemize}
+                \item Start with gradient information (2 $\times$ dimensionality + 1) and move up
+                      from there. %Add in all correlation effects because it won't be that expensive. Discussion of higher dimension correlation further out
+                \item What is the most dense the calculations should be and how many factor
+                      levels should be tested (this may require some trial-and-error to sort)?
+            \end{itemize}
+            \item Checking across 3 general small molecule force fields (\textit{GAFF2},
+                  \textit{parm99} and \textit{CGenFF}) the standard 
+                  deviation in $\epsilon$ was ~0.0034 and in
+                  r$_{min,half}$ was ~0.0638, which are about 21.7 and 4.3 \% of the 
+                  \textit{smirnoff99Frosst} values, respectively.
+            \item Given standard deviations of parameters from other general organic forcefields,
+                  the stability tests will be, at max, 20 \% change in $\epsilon$ and 5 \% 
+                  in r$_{min,half}$.
+        \end{itemize}        
         \item Same results from 4D experiments with $[\#1:1]-[\#6X4]$ added
+        \begin{itemize}
+            \item Checking across 3 general small molecule force fields (\textit{GAFF2},
+                  \textit{parm99} and \textit{CGenFF}) the standard deviation in $\epsilon$ 
+                  was ~0.0144 and in $r_{min,half}$ was ~0.0672, which are about 13.2 and 3.5
+                  \% of the \textit{smirnoff99Frosst} values, respectively. 
+            \item Given standard deviations of parameters from other general organic 
+                  forcefields, the stability tests will be, at max, 15 \% change in 
+                  $\epsilon$ and 5 \% in r$_{min,half}$.
+        \end{itemize}
         \item Scale up to all 5 SMIRKS (10-D parameter space)
-	%\begin{itemize}
-	%    \item Do we include MBAR?
-	%    \begin{itemize}
-	%    	\item Use MBAR like a look up table. Don't fit points produced with MBAR. Just MC sample on a grid of points produced with MBAR to see 
-	%    	      where the higher probability region is. If on edge, move to edge and simulate again, repeat.
-	%    \end{itemize}
-	%    \begin{itemize}
-	%    	\item Note: Physical surrogates won't make use of MBAR since 
-	%    	      there won't be fitting data
-	%    \end{itemize}        
-	%\end{itemize}
-    %\item \textbf{Hypothesis: Different sampling algorithms will affect the speed of convergence to our final force field as well final distribution of parameters sampled.}
+        \begin{itemize}
+            \item Similar variance analyses for $\epsilon$ and r$_{min,half}$ of 
+                  $[\#8X2H1+0:1]$, $[\#1:1]-[\#8]$, 
+                  $[\#1:1]-[\#6X4]-[\#7,\#8,\#9,\#16,\#17,\#35]$ yield the following:
+            \begin{itemize}
+                \item $[\#8X2H1+0:1]$: $Var\left(\epsilon\right)^{0.5} = 0.0516$ and 
+                      $Var\left(r_{min,half}\right)^{0.5} = 0.0405$, which are about 
+                      24.5 and 2.4 \% of the \textit{smirnoff99Frosst} values, respectively.
+                \item $[\#1:1]-[\#8]$: $Var\left(\epsilon\right)^{0.5} = 0.1202$ and 
+                      $Var\left(r_{min,half}\right)^{0.5} = 0.1047$, which are about 
+                      40.1 and 20000 \% of the \textit{smirnoff99Frosst} values, respectively.
+                      Given that these values are pretty ridiculous, I'll keep with the trend
+                      of ~20 \% changes in $\epsilon$ and ~5 \% changes in r$_{min,half}$.
+                \item $[\#1:1]-[\#6X4]-[\#7,\#8,\#9,\#16,\#17,\#35]$:                                                   $Var\left(\epsilon\right)^{0.5} = 0.00505$ and                                                   $Var\left(r_{min,half}\right)^{0.5} = 0.0275$, which are about 
+                      32.1 and 2.0 \% of the \textit{smirnoff99Frosst} values, respectively.
+            \end{itemize}
+            \item Given results from variance analyses over all 5 SMIRKS/atom types, I think
+                  maximum changes of 25 \% of the $\epsilon$ and 5 \% of the r$_{min,half}$ in 
+                  \textit{smirnoff99Frosst} would be appropriate for the stability tests.
+        \end{itemize}
     \item Ideas for comparing force fields (different start points) 
     % Robustness of parameter choices given a final posterior distribution
     \begin{itemize}
-    	\item KL divergence (and one other probability convergence criteria if Josh has a recommendation)
+    	\item KL divergence/some other probability distribution convergence test
+        \begin{itemize}
+            \item Stability of solution (from different starting points do we get same answer?)
+            \item Maximum likelihood calculation of GP
+            \begin{itemize}
+                \item More detail. Is this possible? 
+            \end{itemize}
+            \item Discrete KL divergence
+            \item Maximum Mean Discrepancy estimators
+            \item Some theory: \url{http://papers.nips.cc/paper/3417-estimation-of-information-
+                  theoretic-measures-for-continuous-random-variables}
+            \item Practically: \url{https://github.com/gregversteeg/NPEET}
+        \end{itemize}
     	\item Speed of convergence
-    	\item Stability of solution (from different starting points do we get same answer?) 
+        \begin{itemize}
+            \item Number of iterations to convergence
+            \item Total wall time
+        \end{itemize} 
     	\item Simulation of properties, using final parameters, that 
-    	      were not in training set
+    	      were not in training set % Let's do same properties different molecules outside of training set
+	                               % Maybe also add different temperatures for training 
     	\begin{itemize}
     		\item 3-fold verification
     		\begin{itemize}
-    			\item Different properties not in training set
+    			%\item Different properties not in training set
     			\item Extrapolation to thermodynamic state outside of training set (T, P)
     			\item Other molecules outside of training set that have the same SMIRKS types
     		\end{itemize}    		
