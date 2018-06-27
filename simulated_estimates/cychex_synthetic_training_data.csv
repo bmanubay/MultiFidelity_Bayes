@@ -1,0 +1,2 @@
+;E_bulk_sim (kJ/mol);E_vac_sim (kJ/mol);Hvap_sim (kJ/mol);Vol_sim (mL/mol);dE_bulk_sim (kJ/mol);dE_vac_sim (kJ/mol);dHvap_sim (kJ/mol);dVol_sim (mL/mol);eps_val;rmin_half_val
+0;12670.483583563813;84.94405118194025;36.722076291717876;108.96590066460662;2.866646055190401;0.11304038990793303;0.11362047485303076;0.012519370643216335;0.1094;1.908
