@@ -22,15 +22,14 @@ import openmmtools.integrators as ommtoolsints
 import mdtraj as md
 from itertools import product
 import pickle
+import re
 #-------------------------------------------------
 def read_traj(ncfiles,indkeep=0):
     """
     Take multiple .nc files and read in coordinates in order to re-valuate energies based on parameter changes
-
     Parameters
     -----------
     ncfiles - a list of trajectories in netcdf format
-
     Returns
     ----------
     data - all of the data contained in the netcdf file
@@ -99,7 +98,6 @@ def get_energy_vac(system, positions):
         The system to check
     positions : simtk.unit.Quantity of dimension (natoms,3) with units of length
         The positions to use
-
     Returns
     ---------
     energy
@@ -128,11 +126,9 @@ def new_param_energy(coords, params, topology, vecs, P=1.01, T=293.15,NPT=False,
     params:  arbitrary length dictionary of changes in parameter across arbitrary number of states. Highest level key is the molecule AlkEthOH_ID,
              second level of keys are the new state, the values of each of these subkeys are a arbitrary length list of length 3 lists where the
              length 3 lists contain information on a parameter to change in the form: [SMIRKS, parameter type, parameter value]. I.e. :
-
              params = {'AlkEthOH_c1143':{'State 1':[['[6X4:1]-[#1:2]','k','620'],['[6X4:1]-[#6X4:2]','length','1.53'],...],'State 2':[...],...}}
     P: Pressure of the system. By default set to 1.01 bar.
     T: Temperature of the system. By default set to 300 K.
-
     Returns
     -------
     E_kn: a kxN matrix of the dimensional energies associated with the forcfield parameters used as input
@@ -218,10 +214,8 @@ def new_param_energy_vac(coords, params, T=293.15):
     params:  arbitrary length dictionary of changes in parameter across arbitrary number of states. Highest level key is the molecule AlkEthOH_ID,
              second level of keys are the new state, the values of each of these subkeys are a arbitrary length list of length 3 lists where the
              length 3 lists contain information on a parameter to change in the form: [SMIRKS, parameter type, parameter value]. I.e. :
-
              params = {'AlkEthOH_c1143':{'State 1':[['[6X4:1]-[#1:2]','k','620'],['[6X4:1]-[#6X4:2]','length','1.53'],...],'State 2':[...],...}}
     T: Temperature of the system. By default set to 300 K.
-
     Returns
     -------
     E_kn: a kxN matrix of the dimensional energies associated with the forcfield parameters used as input
@@ -313,23 +307,8 @@ MMcyc = 84.15948 #g/mol
 # We define here what data will be used for the reference states in the MBAR calculation
 # The list `files` can be of arbitrary length
 # Potential TODO: Separate these files from my other simulations and just glob grab all files in the up-to-date `references`  folder
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.9080.nc','cyclohexane_250_[#6X4:1]_epsilon0.110623_rmin_half1.8870.nc','cyclohexane_250_[#6X4:1]_epsilon0.114614125174_rmin_half1.88714816576.nc']
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.085_rmin_half2.45.nc','cyclohexane_250_[#6X4:1]_epsilon0.0350482467832_rmin_half2.34738763255.nc','cyclohexane_250_[#6X4:1]_epsilon0.1085_rmin_half2.285.nc']
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.085_rmin_half2.45.nc','cyclohexane_250_[#6X4:1]_epsilon0.1085_rmin_half2.285.nc','cyclohexane_250_[#6X4:1]_epsilon0.0590978610897_rmin_half2.07011439037.nc']
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.1085_rmin_half2.285.nc','cyclohexane_250_[#6X4:1]_epsilon0.0590978610897_rmin_half2.07011439037.nc','cyclohexane_250_[#6X4:1]_epsilon0.109_rmin_half1.9296.nc'] 
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.109_rmin_half1.9296.nc','cyclohexane_250_[#6X4:1]_epsilon0.106_rmin_half1.878.nc','cyclohexane_250_[#6X4:1]_epsilon0.111102031331_rmin_half1.88003963316.nc'] 
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.111102031331_rmin_half1.88003963316.nc','cyclohexane_250_[#6X4:1]_epsilon0.123802859878_rmin_half1.83009792013.nc','cyclohexane_250_[#6X4:1]_epsilon0.122806466703_rmin_half1.83153401667.nc','cyclohexane_250_[#6X4:1]_epsilon0.123056669259_rmin_half1.82907156612.nc'] #lowhigh
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.15_rmin_half2.5.nc','cyclohexane_250_[#6X4:1]_epsilon0.032838514744_rmin_half2.47399343003.nc','cyclohexane_250_[#6X4:1]_epsilon0.0291396893816_rmin_half2.44801411952.nc','cyclohexane_250_[#6X4:1]_epsilon0.112177820691_rmin_half2.26019955072.nc']
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.112177820691_rmin_half2.26019955072.nc','cyclohexane_250_[#6X4:1]_epsilon0.0989536390631_rmin_half2.03461350156.nc','cyclohexane_250_[#6X4:1]_epsilon0.0879851616583_rmin_half1.86229747403.nc']
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.0846735362592_rmin_half1.92520944034.nc','cyclohexane_250_[#6X4:1]_epsilon0.0998180517699_rmin_half1.8870420476.nc','cyclohexane_250_[#6X4:1]_epsilon0.124483041163_rmin_half1.90601304086.nc','cyclohexane_250_[#6X4:1]_epsilon0.11721479634_rmin_half1.85079233717.nc'] #highhigh 
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.124483041163_rmin_half1.90601304086.nc','cyclohexane_250_[#6X4:1]_epsilon0.11721479634_rmin_half1.85079233717.nc','cyclohexane_250_[#6X4:1]_epsilon0.120383091103_rmin_half1.83324791999.nc','cyclohexane_250_[#6X4:1]_epsilon0.111720699353_rmin_half1.84394011198.nc'] 
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.120383091103_rmin_half1.83324791999.nc','cyclohexane_250_[#6X4:1]_epsilon0.111720699353_rmin_half1.84394011198.nc','cyclohexane_250_[#6X4:1]_epsilon0.113291079982_rmin_half1.84034392831.nc','cyclohexane_250_[#6X4:1]_epsilon0.123476918293_rmin_half1.81040455874.nc']
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.120383091103_rmin_half1.83324791999.nc','cyclohexane_250_[#6X4:1]_epsilon0.123476918293_rmin_half1.81040455874.nc','cyclohexane_250_[#6X4:1]_epsilon0.120806343095_rmin_half1.82651886871.nc','cyclohexane_250_[#6X4:1]_epsilon0.12689920064_rmin_half1.79748919739.nc','cyclohexane_250_[#6X4:1]_epsilon0.12717137523_rmin_half1.79711005539.nc']
-files = ['cyclohexane_250_[#6X4:1]_epsilon0.12689920064_rmin_half1.79748919739.nc','cyclohexane_250_[#6X4:1]_epsilon0.12717137523_rmin_half1.79711005539.nc']#highhigh
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.1102_rmin_half1.747.nc','cyclohexane_250_[#6X4:1]_epsilon0.121_rmin_half1.845.nc','cyclohexane_250_[#6X4:1]_epsilon0.123169898921_rmin_half1.80998708165.nc','cyclohexane_250_[#6X4:1]_epsilon0.122736702268_rmin_half1.81324689412.nc','cyclohexane_250_[#6X4:1]_epsilon0.122996070934_rmin_half1.8097651118.nc']
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.118_rmin_half1.666.nc','cyclohexane_250_[#6X4:1]_epsilon0.1102_rmin_half1.747.nc','cyclohexane_250_[#6X4:1]_epsilon0.0634082340145_rmin_half1.87902491641.nc']#'cyclohexane_250_[#6X4:1]_epsilon0.121_rmin_half1.845.nc']#,'cyclohexane_250_[#6X4:1]_epsilon0.149885671264_rmin_half1.84779306431.nc']#['cyclohexane_250_[#6X4:1]_epsilon0.05_rmin_half1.5.nc','cyclohexane_250_[#6X4:1]_epsilon0.118_rmin_half1.666.nc']
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.9080.nc','cyclohexane_250_[#6X4:1]_epsilon0.0972166482044_rmin_half1.92015303945.nc','cyclohexane_250_[#6X4:1]_epsilon0.129280592666_rmin_half1.80945011123.nc','cyclohexane_250_[#6X4:1]_epsilon0.129946677226_rmin_half1.80632698086.nc','cyclohexane_250_[#6X4:1]_epsilon0.129422275289_rmin_half1.80803528024.nc','cyclohexane_250_[#6X4:1]_epsilon0.129684432789_rmin_half1.80796234322.nc'] 
-#files = ['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.9080.nc','cyclohexane_250_[#6X4:1]_epsilon0.102200007296_rmin_half1.91839456869.nc','cyclohexane_250_[#6X4:1]_epsilon0.114144607104_rmin_half1.88700000237.nc','cyclohexane_250_[#6X4:1]_epsilon0.114544784073_rmin_half1.88700000176.nc','cyclohexane_250_[#6X4:1]_epsilon0.114745093562_rmin_half1.88700000404.nc','cyclohexane_250_[#6X4:1]_epsilon0.114493562595_rmin_half1.88700000523.nc']#['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.9080.nc','cyclohexane_250_[#6X4:1]_epsilon0.10220000002_rmin_half1.92580500001.nc']
+files = ['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.908_[#1:1]-[#6X4]_epsilon0.0157_rmin_half1.56135.nc','cyclohexane_250_[#6X4:1]_epsilon0.11487_rmin_half1.8126_[#1:1]-[#6X4]_epsilon0.014915_rmin_half1.41265.nc']#highhigh
+
 
 # Extracting the '[#6X4:1]_epsilon<value>_rmin_half<value>' part of the strings from `files`
 file_strings = [i.rsplit('.',1)[0].split('_',2)[2] for i in files]
@@ -342,9 +321,27 @@ file_tups_traj_vac = [['traj_cychex_neat/Lang_2_baro10step_pme1e-5/cyclohexane_'
 file_tups_sd = [['StateData_cychex_neat/Lang_2_baro10step_pme1e-5/cyclohexane_250_'+i+'_wNoConstraints_1fsts.csv'] for i in file_strings]
 file_tups_sd_vac = [['StateData_cychex_neat/Lang_2_baro10step_pme1e-5/cyclohexane_'+i+'_wNoConstraints_vacuum_0.8fsts.csv'] for i in file_strings]
 
-# Create a list of lists for the parameters in the reference data
-params = [i.rsplit('.',1)[0].rsplit('_') for i in files]
-params = [(i[3][7:],i[5][4:]) for i in params]
+# Create a list of lists for the parameters in the reference data. Regex retains order for search
+params = [re.findall(r"[-+]?\d*\.\d+", i) for i in file_strings]
+
+# Create a list of SMIRKS strings that were altered during reference simulations (the ones we'll be changing for MBAR) 
+file_strings_sep = [i.rsplit('.',1)[0].rsplit('_') for i in files]
+smirks_no_filter = [re.findall(r'\[(.*)\]', i) for j in file_strings_sep for i in j]
+
+# Remove empty lists
+smirks_no_filter = [x for x in smirks_no_filter if x != []]
+
+# Compress redundant dimensions
+smirks_no_filter = list( np.squeeze(smirks_no_filter))
+
+# uniquify list while retaining order
+#smirks = []
+#for i in smirks_no_filter:
+#    if i not in smirks:#
+	    smirks.append(i)
+
+# Add brackets back to SMIRKS strings		
+smirks = ['['+i+']' for i in smirks]
 
 
 # Set up containers for all the data I'm extracting from the trajectories
@@ -436,7 +433,11 @@ for j,i in enumerate(file_tups_sd_vac):
 ###################################################################################
 ####################PARAMETERS OF INTEREST#########################################
 ###################################################################################
-param_types = ['epsilon','rmin_half']
+param_types = ['epsilon','rmin_half','epsilon','rmin_half']
+
+for i in params:
+    if len(param_types) != len(i):
+	    raise ValueError('A value must be specified for each parameter type for each SMIRKS')
 
 
 ###################################################################################
@@ -542,13 +543,18 @@ for i,j in enumerate(vol_sub):
 
 # Define new parameter states we wish to evaluate energies at
 # Arrays of length 3 produced based on bounds of parameters fed to python command
-eps_vals = np.linspace(float(argv[1]),float(argv[2]),3)
-rmin_vals = np.linspace(float(argv[3]),float(argv[4]),3)
+eps_vals1 = np.array([0.9*float(params[-1][0]),float(params[-1][0]),1.1*float(params[-1][0])])
+rmin_vals1 = np.array([0.975*float(params[-1][1]),float(params[-1][1]),1.025*float(params[-1][1])])
+eps_vals2 = np.array([0.9*float(params[-1][2]),float(params[-1][2]),1.1*float(params[-1][2])])
+rmin_vals2 = np.array([0.975*float(params[-1][3]),float(params[-1][3]),1.025*float(params[-1][3])])
 
 # Turn array of floats into list of strings (the forcefield editing machinery takes string inputs) 
-eps_vals = [str(a) for a in eps_vals]
-rmin_vals = [str(a) for a in rmin_vals]
-new_states = list(product(eps_vals,rmin_vals))# List of all (eps, rmin_half) combinations 
+eps_vals1 = [str(a) for a in eps_vals1]
+rmin_vals1 = [str(a) for a in rmin_vals1]
+eps_vals2 = [str(a) for a in eps_vals2]
+rmin_vals2 = [str(a) for a in rmin_vals2]
+
+new_states = list(product(eps_vals1,rmin_vals1,eps_vals2,rmin_vals2))# List of all (eps, rmin_half) combinations 
 
 new_states = list(set(new_states)) # uniquefy list
 
@@ -596,7 +602,7 @@ for ii,value in enumerate(xyz_orig_sub):
     print( "starting MBAR calculations")
     D = OrderedDict()
     for i,val in enumerate(MBAR_moves):
-        D['State' + ' ' + str(i)] = [["[#6X4:1]",param_types[j],val[j]] for j in range(len(param_types))]#len(state_orig))]
+        D['State' + ' ' + str(i)] = [[smirks[j],param_types[j],val[j]] for j in range(len(param_types))]
     D_mol = {'cyclohexane' : D} 
         
     # Produce the u_kn matrix for MBAR based on the subsampled configurations
@@ -618,7 +624,7 @@ for ii,value in enumerate(xyz_orig_sub):
     print( "starting MBAR calculations")
     D = OrderedDict()
     for i,val in enumerate(MBAR_moves):
-        D['State' + ' ' + str(i)] = [["[#6X4:1]",param_types[j],val[j]] for j in range(len(param_types))]#len(state_orig))]
+        D['State' + ' ' + str(i)] = [[smirks[j],param_types[j],val[j]] for j in range(len(param_types))]
     D_mol = {'cyclohexane' : D}
  
     #Produce the u_kn matrix for MBAR based on the subsampled configurations
@@ -814,4 +820,3 @@ df.to_csv('StateData_cychex_neat/Lang_2_baro10step_pme1e-5/MBAR_estimates/MBAR_e
 #    pickle.dump(u_kn, f)
 #with open('u_kn_vac_1fs.pkl', 'wb') as f:
 #    pickle.dump(u_kn_vac, f)
-
