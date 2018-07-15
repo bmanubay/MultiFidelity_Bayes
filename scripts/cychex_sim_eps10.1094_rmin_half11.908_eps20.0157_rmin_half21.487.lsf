@@ -1,0 +1,20 @@
+#!/bin/sh
+#BSUB -J cychex_lj_vanilla
+#BSUB -n 2
+#BSUB -q gpuqueue 
+#BSUB -gpu "num=2"
+#BSUB -W 10:00
+#BSUB -o %J.stdout
+#BSUB -eo %J.stderr
+#BSUB -u brma3379@colorado.edu
+#BSUB -B
+
+cd $LS_SUBCWD
+export OE_DIR=/home/fassj/.OpenEye
+export PATH=/home/brma3379/anaconda3/bin:$PATH
+source activate openff2
+module load cuda/9.0
+
+
+python run_molecule_4D.py cyclohexane C1CCCCC1 250 [#6X4:1] epsilon rmin_half 0.1094 1.908 [#1:1]-[#6X4] 0.0157 1.487 & 
+python run_molecule_single_var_4D.py cyclohexane [#6X4:1] epsilon rmin_half 0.1094 1.908 [#1:1]-[#6X4] 0.0157 1.487 & 

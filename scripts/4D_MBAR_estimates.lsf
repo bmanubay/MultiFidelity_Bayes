@@ -1,0 +1,21 @@
+#!/bin/sh
+#BSUB -J 4D_MBAR_estimates
+#BSUB -n 2
+#BSUB -R "span[ptile=4]"
+#BSUB -q cpuqueue
+#BSUB -M 10
+#BSUB -W 20:00
+#BSUB -o %J.stdout
+#BSUB -eo %J.stderr
+#BSUB -u brma3379@colorado.edu
+#BSUB -B 
+###BSUB -b 20:00 
+
+cd $LS_SUBCWD
+export OE_DIR=/home/fassj/.OpenEye
+export PATH=/home/brma3379/anaconda3/bin:$PATH
+source activate openff2
+####module load cuda/9.0
+
+python run_MBAR_arbitrary_params_dim.py 0 8 &
+python run_MBAR_arbitrary_params_dim.py 8 16  &
