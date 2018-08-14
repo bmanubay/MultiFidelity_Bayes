@@ -75,7 +75,7 @@ def get_energy(system, positions, vecs):
     energy
     """
     
-    integrator = ommtoolsints.LangevinIntegrator(293.15 * kelvin, 1./picoseconds, 2. * femtoseconds)
+    integrator = ommtoolsints.LangevinIntegrator(293.15 * kelvin, 1./picoseconds, 1. * femtoseconds)
     platform = mm.Platform.getPlatformByName('CPU')
     #platform = mm.Platform.getPlatformByName('CUDA')
     #properties = {"CudaPrecision": "mixed","DeterministicForces": "true" }
@@ -103,7 +103,7 @@ def get_energy_vac(system, positions):
     energy
     """
 
-    integrator = ommtoolsints.LangevinIntegrator(293.15 * kelvin, 1./picoseconds, 1.5 * femtoseconds)
+    integrator = ommtoolsints.LangevinIntegrator(293.15 * kelvin, 1./picoseconds, 0.8 * femtoseconds)
     platform = mm.Platform.getPlatformByName('CPU')
     #platform = mm.Platform.getPlatformByName('CUDA')
     #properties = {"CudaPrecision": "mixed","DeterministicForces": "true" }
@@ -117,7 +117,7 @@ def get_energy_vac(system, positions):
     return energy
 
 #---------------------------------------------------
-def new_param_energy(coords, params, topology, vecs, P=1.01, T=293.15,NPT=False,V=None,P_conv=1.e5,V_conv=1.e-6,Ener_conv=1.e-3,N_part=250.):
+def new_param_energy(coords, params, topology, vecs, T, P=1.01,NPT=False,V=None,P_conv=1.e5,V_conv=1.e-6,Ener_conv=1.e-3,N_part=250.):
     """
     Return potential energies associated with specified parameter perturbations.
     Parameters
@@ -139,7 +139,7 @@ def new_param_energy(coords, params, topology, vecs, P=1.01, T=293.15,NPT=False,
     # CONSTANTS
     #-------------------
     kB = 0.0083145  #Boltzmann constant (Gas constant) in kJ/(mol*K)
-    beta = 1/(kB*T)
+    #beta = 1/(kB*T)
 
     #-------------------
     # PARAMETERS
@@ -163,9 +163,9 @@ def new_param_energy(coords, params, topology, vecs, P=1.01, T=293.15,NPT=False,
     K = len(params['cyclohexane'].keys())
     
     # Load forcefield file
-    #ffxml = 'smirnoff99Frosst_with_AllConstraints.ffxml'#
+    ffxml = 'smirnoff99Frosst.ffxml'#
     #print('The forcefield being used is smirnoff99Frosst_with_AllConstraints.ffxml')
-    ffxml = get_data_filename('forcefield/smirnoff99Frosst.ffxml')
+    #ffxml = get_data_filename('forcefield/smirnoff99Frosst.ffxml')
     print('The forcefield being used is smirnoff99Frosst.ffxml')
 
     ff = ForceField(ffxml)
@@ -186,23 +186,31 @@ def new_param_energy(coords, params, topology, vecs, P=1.01, T=293.15,NPT=False,
         for k,l in enumerate(params[AlkEthOH_id]):
             print("Anotha one")
             for m,n in enumerate(params[AlkEthOH_id][l]):
+                #print(n)
                 newparams = ff.getParameter(smirks=n[0])
                 newparams[n[1]]=n[2]
                 ff.setParameter(newparams,smirks=n[0])
-                system = ff.createSystem(top,mols,nonbondedMethod=PME,nonbondedCutoff=1.125*nanometers)#,ewaldErrorTolerance=1.e-5)
-                barostat = MonteCarloBarostat(P*bar, T*kelvin, 10)
-                system.addForce(barostat)
+                system = ff.createSystem(top,mols,nonbondedMethod=PME,nonbondedCutoff=1.125*nanometers,ewaldErrorTolerance=1.e-5)
+                #barostat = MonteCarloBarostat(P*bar, T*kelvin, 10)
+                #system.addForce(barostat)
                 #print(ff.getParameter(smirks=n[0]))
             for o,p in enumerate(coords):
+                barostat = MonteCarloBarostat(P*bar, T[o]*kelvin, 10)
+                system.addForce(barostat)
+                #print(ff.getParameter(smirks=n[0]))
                 e = get_energy(system,p,vecs[o])
-                 
+                #print(e)
+                beta = 1/(kB*T[o])
+                #print(e) 
                 if not NPT:
+                    #print("NVT")
                     E_kn[k,o] = e._value
                     u_kn[k,o] = e._value*beta
                 else:
+                    #print("NPT")
                     E_kn[k,o] = e._value + P*P_conv*V[o]*V_conv*Ener_conv*N_part
                     u_kn[k,o] = (e._value + P*P_conv*V[o]*V_conv*Ener_conv*N_part)*beta
-    
+                    #print(E_kn)
     return E_kn,u_kn
 
 #---------------------------------------------------------------------------
@@ -227,7 +235,7 @@ def new_param_energy_vac(coords, params, T=293.15):
     # CONSTANTS
     #-------------------
     kB = 0.0083145  #Boltzmann constant (Gas constant) in kJ/(mol*K)
-    beta = 1/(kB*T)
+    #beta = 1/(kB*T)
 
     #-------------------
     # PARAMETERS
@@ -285,7 +293,11 @@ def new_param_energy_vac(coords, params, T=293.15):
                 system = ff.createSystem(topology, [mol])
             #print(newparams)
             for o,p in enumerate(coords):
+                #print(ff.getParameter(smirks='[#6X4:1]'))
+                #print(ff.getParameter(smirks='[#1:1]-[#6X4]'))
+                beta = 1/(kB*T[o])
                 e = get_energy_vac(system,p)
+                #print(e)
                 E_kn[k,o] = e._value
                 u_kn[k,o] = e._value*beta
 
@@ -308,12 +320,11 @@ MMcyc = 84.15948 #g/mol
 # We define here what data will be used for the reference states in the MBAR calculation
 # The list `files` can be of arbitrary length
 # Potential TODO: Separate these files from my other simulations and just glob grab all files in the up-to-date `references`  folder
-files = ['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.9080.nc']#['cyclohexane_250_[#6X4:1]_epsilon0.1094_rmin_half1.908_[#1:1]-[#6X4]_epsilon0.0157_rmin_half1.487.nc','cyclohexane_250_[#6X4:1]_epsilon0.11213499999999997_rmin_half1.908_[#1:1]-[#6X4]_epsilon0.0157_rmin_half1.487.nc']
-
+files = ['cyclohexane_250_[#6X4:1]_epsilon0.123075_rmin_half1.9557_[#1:1]-[#6X4]_epsilon0.017662499999999998_rmin_half1.524175.nc','cyclohexane_250_[#6X4:1]_epsilon0.08086972_rmin_half1.99756248_[#1:1]-[#6X4]_epsilon0.00898037_rmin_half1.47905755.nc']
 
 # Extracting the '[#6X4:1]_epsilon<value>_rmin_half<value>' part of the strings from `files`
 file_strings = [i.rsplit('.',1)[0].split('_',2)[2] for i in files]
-print(file_strings)
+
 # Creating the correct filenames for the data I want to use
 # Configuration and state data trajectories for the liquid and ideal gasw simulations
 file_tups_traj = [['traj_cychex_neat/Lang_2_baro10step_pme1e-5/cyclohexane_250_'+i+'_wNoConstraints_1fsts.nc'] for i in file_strings]
@@ -321,30 +332,23 @@ file_tups_traj_vac = [['traj_cychex_neat/Lang_2_baro10step_pme1e-5/cyclohexane_'
 
 file_tups_sd = [['StateData_cychex_neat/Lang_2_baro10step_pme1e-5/cyclohexane_250_'+i+'_wNoConstraints_1fsts.csv'] for i in file_strings]
 file_tups_sd_vac = [['StateData_cychex_neat/Lang_2_baro10step_pme1e-5/cyclohexane_'+i+'_wNoConstraints_vacuum_0.8fsts.csv'] for i in file_strings]
-print(file_tups_traj)
+
 # Create a list of lists for the parameters in the reference data. Regex retains order for search
 params = [re.findall(r"[-+]?\d*\.\d+", i) for i in file_strings]
-print(params)
+
 # Create a list of SMIRKS strings that were altered during reference simulations (the ones we'll be changing for MBAR) 
 file_strings_sep = [i.rsplit('.',1)[0].rsplit('_') for i in files]
 smirks_no_filter = [re.findall(r'\[(.*)\]', i) for j in file_strings_sep for i in j]
-print(smirks_no_filter)
+
 # Remove empty lists
 smirks_no_filter = [x for x in smirks_no_filter if x != []]
 
 # Compress redundant dimensions
-smirks_no_filter = np.squeeze(smirks_no_filter)#2*list( np.squeeze(smirks_no_filter))
-print(smirks_no_filter)
-#smirks_no_filter = sorted(smirks_no_filter, key=len)
-# uniquify list while retaining order
-#smirks = []
-#for i in smirks_no_filter:
-#    if i not in smirks:#
-#	    smirks.append(i)
+smirks_no_filter = list( np.squeeze(smirks_no_filter))
+smirks_no_filter = sorted(smirks_no_filter, key=len)
 
 # Add brackets back to SMIRKS strings		
-smirks = 2*['['+str(smirks_no_filter)+']']#['['+i+']' for i in smirks_no_filter]
-
+smirks = ['['+i+']' for i in smirks_no_filter]
 
 # Set up containers for all the data I'm extracting from the trajectories
 xyz_orig = [[] for i in file_tups_traj] # coordinates from liquid sims
@@ -359,9 +363,9 @@ steps_orig_vac = [[] for i in file_tups_sd] # step number from gas sims (debuggi
 temp_orig = [[] for i in file_tups_sd] # temperatures from liquid sims
 temp_orig_vac = [[] for i in file_tups_sd] # temperatures from gas sims
 
-# Define number of burnin samples for the liquid and gas sims
-burnin = 500#1949
-burnin_vac = 500#3949
+# Define number of burnin samples for the liquid and gas sims (could set up better way to do this with equilibration detection)
+burnin = 7500#8000#9997#1000#1949
+burnin_vac = 7500#9997#1000#3949
 
 print('burnin bulk = %s' %(burnin))
 print('burnin vac = %s' %(burnin_vac))
@@ -370,6 +374,7 @@ print( 'Extracting data from cyclohexane neat liquid configuration trajectories'
 for j,i in enumerate(file_tups_traj):
     for ii in i:            
         try:
+            print(ii)
             data, xyz, lens, angs = read_traj(ii,burnin)           
         except IndexError:
             # If the trajectory has fewer than the burnin samples then give warning flag
@@ -439,7 +444,7 @@ for j,i in enumerate(file_tups_sd_vac):
 ###################################################################################
 ####################PARAMETERS OF INTEREST#########################################
 ###################################################################################
-param_types = ['epsilon','rmin_half']#,'epsilon','rmin_half']
+param_types = ['epsilon','rmin_half','epsilon','rmin_half']
 
 for i in params:
     if len(param_types) != len(i):
@@ -463,7 +468,11 @@ steps_orig_sub = [[] for i in steps_orig]
 steps_orig_vac_sub = [[] for i in steps_orig_vac]
 temp_orig_sub = [[] for i in temp_orig]
 temp_orig_vac_sub = [[] for i in temp_orig_sub]
-
+xyz_all_sub = []
+xyz_all_vac_sub = []
+temp_all_sub = []
+temp_all_vac_sub = []
+vecs_all_sub = []
 # subsample our liquid timeseries based on the correlation lengths of the energies
 # all subsampling needs to be identical for each state, if we subsampled each observable individually they would likely be different length
 for ii,value in enumerate(ener_orig):
@@ -498,6 +507,9 @@ for ii,value in enumerate(ener_orig):
     steps_orig_sub[ii] = steps_sub
     vecs_orig_sub[ii] = vecs_sub
     temp_orig_sub[ii] = temp_sub
+    vecs_all_sub.extend(vecs_sub)
+    temp_all_sub.extend(temp_sub)
+    xyz_all_sub.extend(xyz_sub)
 
 # subsample the gas phase observables 
 # since I use separate MBAR objects for the liquid and gas observables, they can be subampled separately
@@ -526,15 +538,10 @@ for ii,value in enumerate(ener_orig_vac):
     xyz_orig_vac_sub[ii] = xyz_vac_sub
     steps_orig_vac_sub[ii] = steps_vac_sub
     temp_orig_vac_sub[ii] = temp_vac_sub
-"""
-plt.figure()
-plt.plot(steps_orig_sub[0],vol_orig_sub[0])
-plt.xlabel('Timestep (units of 1 fs)')
-plt.ylabel('Molar Volume (mL/mole)')
-#plt.tight_layout()
-plt.savefig('Molar_volume_trace_4ns.png',dpi=300)
-exit()
-"""
+    temp_all_vac_sub.extend(temp_vac_sub)
+    xyz_all_vac_sub.extend(xyz_vac_sub)
+
+
 vol_sub = np.array(vol_orig_sub)
 temp_sub = np.array(temp_orig_sub)
 temp_vac_sub = np.array(temp_orig_vac_sub)
@@ -552,18 +559,18 @@ for i,j in enumerate(vol_sub):
 
 # Define new parameter states we wish to evaluate energies at
 # Arrays of length 3 produced based on bounds of parameters fed to python command
-eps_vals1 = np.array([0.975*float(params[-1][0]),float(params[-1][0]),1.025*float(params[-1][0])])
-rmin_vals1 = np.array([0.995*float(params[-1][1]),float(params[-1][1]),1.005*float(params[-1][1])])
-#eps_vals2 = np.array([0.975*float(params[-1][2]),float(params[-1][2]),1.025*float(params[-1][2])])
-#rmin_vals2 = np.array([0.995*float(params[-1][3]),float(params[-1][3]),1.005*float(params[-1][3])])
+eps_vals1 = np.array([0.95*float(params[-1][0]),float(params[-1][0]),1.05*float(params[-1][0])])
+rmin_vals1 = np.array([0.99*float(params[-1][1]),float(params[-1][1]),1.01*float(params[-1][1])])
+eps_vals2 = np.array([0.95*float(params[-1][2]),float(params[-1][2]),1.05*float(params[-1][2])])
+rmin_vals2 = np.array([0.99*float(params[-1][3]),float(params[-1][3]),1.01*float(params[-1][3])])
 
 # Turn array of floats into list of strings (the forcefield editing machinery takes string inputs) 
 eps_vals1 = [str(a) for a in eps_vals1]
 rmin_vals1 = [str(a) for a in rmin_vals1]
-#eps_vals2 = [str(a) for a in eps_vals2]
-#rmin_vals2 = [str(a) for a in rmin_vals2]
+eps_vals2 = [str(a) for a in eps_vals2]
+rmin_vals2 = [str(a) for a in rmin_vals2]
 
-new_states = list(product(eps_vals1,rmin_vals1))#,eps_vals2,rmin_vals2))# List of all (eps, rmin_half) combinations 
+new_states = list(product(eps_vals1,rmin_vals1,eps_vals2,rmin_vals2))# List of all (eps, rmin_half) combinations 
 
 new_states = list(set(new_states)) # uniquefy list
 print(len(new_states))
@@ -584,24 +591,28 @@ state_coords = orig_state
 for i in new_states:
      state_coords.append(i)
 
-with open('state_coords_rmin0.5.pkl', 'wb') as f:
+with open('state_coords_rmin1_stabtesthigh_5ref_randreftest1.pkl', 'wb') as f:
     pickle.dump(state_coords, f)
 
 exit()
 """
 
-pickle_in = open("2d_moves.pkl","rb")#open("state_coords_rmin0.5.pkl","rb")
-state_coords = pickle.load(pickle_in)[int(sys.argv[1]):int(sys.argv[2])]
-#print(state_coords)
+# To make this code more distributed process friendly, I run them off of presaved pickles of state arrays and run a subset of the 
+# indices across many processes (I make them with this file as well. The triple quote commented out lines above show the way to do this.) 
+# `python run_MBAR_arbitrary_dim.py 0 8` runs states 0 through 7 as defined by the pickle file.
+
+pickle_in = open('state_coords_rmin1_stabtesthigh_5ref_randreftest1.pkl','rb')
+state_coords = pickle.load(pickle_in)[int(sys.argv[1]):int(sys.argv[2])] #load whatever state coords defined in command line args
+
+# Add the reference states back to the state coordinates being fed to MBAR
+for j,i in enumerate(orig_state):
+    if i not in state_coords:
+        state_coords.insert(j,i)
+
+
 # load up the packmol box from the liquid simulation for energy re-evaluation
 filename = 'packmol_boxes/cyclohexane_250.pdb'
 pdb = PDBFile(filename)
-
-# Make containers for u_kn and E_kn matrices
-u_kns = np.zeros([len(state_coords),sum([len(i) for i in ener_orig_sub])],np.float64)
-E_kns = np.zeros([len(state_coords),sum([len(i) for i in ener_orig_sub])],np.float64)
-u_kns_vac = np.zeros([len(state_coords),sum([len(i) for i in ener_orig_vac_sub])],np.float64)
-E_kns_vac = np.zeros([len(state_coords),sum([len(i) for i in ener_orig_vac_sub])],np.float64)
 
 # Make new N_k (samples per state) objects based on subsampled energy lengths, but also 
 # filling in zeros for the states we're predicting (and don't have samples for)
@@ -614,61 +625,29 @@ for k,i in enumerate(ener_orig_vac_sub):
     N_k_vac[k] = len(i)
 
 # Begin energy re-evaluations
-index = 0
-index_vac = 0
-for ii,value in enumerate(xyz_orig_sub):
-    MBAR_moves = state_coords
-    print( "Number of MBAR calculations for liquid cyclohexane: %s" %(len(MBAR_moves)))
-    print( "starting MBAR calculations")
-    D = OrderedDict()
-    for i,val in enumerate(MBAR_moves):
-        D['State' + ' ' + str(i)] = [[smirks[j],param_types[j],val[j]] for j in range(len(param_types))]
-    D_mol = {'cyclohexane' : D} 
-    print(D_mol)        
-    # Produce the u_kn matrix for MBAR based on the subsampled configurations
-    # The `NPT=True` flag in the function automatically spits out enthalpies instead of internal energies
-    E_kn, u_kn = new_param_energy(xyz_orig_sub[ii],D_mol, pdb.topology,vecs_orig_sub[ii],P=1.01,T = np.mean(temp_sub[ii]),NPT=True,V=vol_sub[ii])
+MBAR_moves = state_coords
 
-    # Filling in re-evaluated energies from the iith reference configuration into the E_kn and u_kn matrices 
-    curr_k = 0
-    for E_n,u_n in zip(E_kn,u_kn): 
-        E_kns[curr_k,index:index+len(E_n)] = E_n
-        u_kns[curr_k,index:index+len(u_n)] = u_n
-        curr_k += 1
+print( "Number of MBAR calculations for liquid cyclohexane: %s" %(len(MBAR_moves)))
+print( "starting MBAR calculations")
+D = OrderedDict()
+for i,val in enumerate(MBAR_moves):
+    D['State' + ' ' + str(i)] = [[smirks[j],param_types[j],val[j]] for j in range(len(param_types))]
+D_mol = {'cyclohexane' : D}
+E_kns, u_kns = new_param_energy(xyz_all_sub,D_mol, pdb.topology,vecs_all_sub,T = temp_all_sub,P=1.01,NPT=True,V=vol_subs[0])
 
-    # this index will indicate where to start adding energies to the E_kn and u_kn matrices on the next iteration of the loop
-    index += len(E_kn[0])
-
-    # Same structure for re-evaluating the gas energies
-    print( "Number of MBAR calculations for cyclohexane in vacuum: %s" %(len(MBAR_moves)))
-    print( "starting MBAR calculations")
-    D = OrderedDict()
-    for i,val in enumerate(MBAR_moves):
-        D['State' + ' ' + str(i)] = [[smirks[j],param_types[j],val[j]] for j in range(len(param_types))]
-    D_mol = {'cyclohexane' : D}
- 
-    #Produce the u_kn matrix for MBAR based on the subsampled configurations
-    E_kn_vac, u_kn_vac = new_param_energy_vac(xyz_orig_vac_sub[ii], D_mol, T = np.mean(temp_vac_sub[ii]))
-
-    curr_k_vac = 0
-
-    for E_n_vac,u_n_vac in zip(E_kn_vac,u_kn_vac):
-        E_kns_vac[curr_k_vac,index_vac:index_vac+len(E_n_vac)] = E_n_vac
-        u_kns_vac[curr_k_vac,index_vac:index_vac+len(u_n_vac)] = u_n_vac
-        curr_k_vac += 1
-
-    index_vac += len(E_kn_vac[0])
+print( "Number of MBAR calculations for cyclohexane in vacuum: %s" %(len(MBAR_moves)))
+print( "starting MBAR calculations")
+E_kns_vac, u_kns_vac = new_param_energy_vac(xyz_all_vac_sub,D_mol,T = temp_all_vac_sub)
 
 # number of states and total number of samples
 K,N = np.shape(u_kns)
 K_vac,N_vac = np.shape(u_kns_vac)
 
-
 # We're going to get bootstrapped estimates of variance in order to test the stability of MBAR's asymptotic
 # variance estimator. Thus, we'll define the number of bootstrap samples and make some containers for the observables
 # we're bootstrapping. 
-nBoots_work = 1000
-nBoots_work_vac = 1000
+nBoots_work = 1#2#1000
+nBoots_work_vac = 1#2#1000
 
 N_eff_boots = []
 u_kn_boots = []
@@ -691,13 +670,6 @@ for n in range(nBoots_work):
     u_kn_boot = u_kns[:,booti]
     vol_sub_boot = vol_subs[:,booti][0]
     u_kn_boots.append(u_kns)
-    #print(E_kn_boot)
-    #print(np.shape(E_kn_boot))
-    #print(u_kn_boot)
-    #print(np.shape(u_kn_boot))
-    #print(vol_sub_boot)
-    #print(np.shape(vol_sub_boot))
-    #set_trace()
     
     # Initialize MBAR with Newton-Raphson
     # Use Adaptive Method (Both Newton-Raphson and Self-Consistent, testing which is better)
@@ -792,23 +764,6 @@ E_vac_boots_vt = np.vstack(E_vac_boots)
 E_vac_bootstrap = [np.mean(E_vac_boots_vt[1:,a]) for a in range(np.shape(E_boots_vt)[1])] #Mean of E calculated with bootstrapping
 dE_vac_bootstrap = [np.std(E_vac_boots_vt[1:,a]) for a in range(np.shape(E_boots_vt)[1])] #Standard error of E from bootstrap
  
-#plt.figure()
-#plt.hist(E_vac_boots_vt[1:,0],bins=200)
-#plt.xlabel('Potential Energy (kJ/mole)')
-#plt.ylabel('Frequency')
-#plt.savefig('vacuum_potential_HConstraints_bootstrap_dist_10ns.png',dpi=300)
-    
-#plt.figure()
-#plt.hist(E_boots_vt[1:,0],bins=200)
-#plt.xlabel('Potential Energy (kJ/mole)')
-#plt.ylabel('Frequency')
-#plt.savefig('bulk_potential_bootstrap_dist.png',dpi=300)
-
-#plt.figure()
-#plt.hist(V_boots_vt[1:,0],bins=200)
-#plt.xlabel('Molar volume (mL/mole)')
-#plt.ylabel('Frequency')
-#plt.savefig('molar_volume_bootstrap_dist.png',dpi=300)
 
 #######################################################################################
 # Calculate heat of vaporization
@@ -840,12 +795,5 @@ df = pd.DataFrame(
                        'N_eff': N_eff
                       })
 
-df.to_csv('StateData_cychex_neat/Lang_2_baro10step_pme1e-5/MBAR_estimates/MBAR_estimates_[6X4:1]_[#1:1]-[#6X4]_eps2.5rmin0.5statecoords'+argv[1]+'-'+argv[2]+'baro10step_molvolPV_wNoConstraintssim_unconstrainedMBAR_MBAR1e-5PMEco_Lang_1fs_0.5nsburn_justnativeref_Tempseries_7-24_2dtest.csv',sep=';')
-#df.to_csv('StateData_cychex_neat/Lang_2_baro10step_pme1e-5/MBAR_estimates/MBAR_estimates_[6X4:1]_eps'+argv[1]+'-'+argv[2]+'_rmin'+argv[3]+'-'+argv[4]+'_baro10step_molvolPV_wNoConstraintssim_unconstrainedMBAR_MBAR1e-5PMEco_Lang_1fs_0.5nsburn_stabilitytestlast4refsof11_epslowrminhigh_Tempseries_5-27.csv',sep=';')   
-#df.to_csv('StateData_cychex_neat/Lang_2_baro10step_pme1e-5/MBAR_estimates/MBAR_estimates_[6X4:1]_eps'+argv[1]+'-'+argv[2]+'_rmin'+argv[3]+'-'+argv[4]+'_baro10step_molvolPV_wNoConstraintssim_unconstrainedMBAR_MBAR1e-5PMEco_Lang_1fs_0.5nsburn_stabilitytest1ref_epslowrminhigh_Tempseries_5-12.csv',sep=';')
-#with open('param_states_1fs.pkl', 'wb') as f:
-#    pickle.dump(MBAR_moves, f)
-#with open('u_kn_bulk_1fs.pkl', 'wb') as f:
-#    pickle.dump(u_kn, f)
-#with open('u_kn_vac_1fs.pkl', 'wb') as f:
-#    pickle.dump(u_kn_vac, f)
+df.to_csv('StateData_cychex_neat/Lang_2_baro10step_pme1e-5/MBAR_estimates/MBAR_estimates_[6X4:1]_[#1:1]-[#6X4]_eps2.5rmin0.5statecoords'+argv[1]+'-'+argv[2]+'baro10step_molvolPV_wNoConstraintssim_unconstrainedMBAR_MBAR1e-5PMEco_Lang_1fs_0.5nsburn_5thiter_5ref_stabtesthigh1_Tempseries_8-13.csv',sep=';')
+

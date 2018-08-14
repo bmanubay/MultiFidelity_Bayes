@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import glob
 
-sim_states = '4D_sim_params.csv'
+sim_states = '4D_test_new_ref_params_rand_sample.csv'
 
 df = pd.read_csv(sim_states, sep=';')
 
