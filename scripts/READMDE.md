@@ -1,8 +1,8 @@
-This file contains the code I use for making and distributing MBAR calculations on Lilac as well as an notebook highlighting the process for making GPs and using them for posterior sampling (messy).
+This folder contains the code I use for making and distributing MBAR calculations on Lilac as well as an notebook highlighting the process for making GPs and using them for posterior sampling (messy).
 
 
 # MBAR Stuff
-`run_MBAR_arbitrary_dims.py` - file used to make MBAR calculations given input reference(s) and an arbitrary dimension of parameter changes
+`run_MBAR_arbitrary_dims.py` - file used to make MBAR calculations given input reference(s) and an arbitrary dimension of parameter changes. //
 `merge_estimates.py` - used to combine all of the estimates from files saved from the distributed calculations
 `4D_MBAR_estimates.lsf` - example lsf script for distributing MBAR caclulations efficiently on Lilac
 
