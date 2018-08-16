@@ -348,8 +348,8 @@ smirks_no_filter = list( np.squeeze(smirks_no_filter))
 smirks_no_filter = sorted(smirks_no_filter, key=len)
 
 # Add brackets back to SMIRKS strings		
-smirks = ['['+i+']' for i in smirks_no_filter]
-
+#smirks = ['['+i+']' for i in smirks_no_filter]
+smirks = ['[#6X4:1]', '[#6X4:1]', '[#1:1]-[#6X4]', '[#1:1]-[#6X4]'] #Uhhhhh, needs to be fixed. Hard coded for 4D problem. Maybe figuring out a way to create a binary of the parameter state with a function call would be worthwhile.
 # Set up containers for all the data I'm extracting from the trajectories
 xyz_orig = [[] for i in file_tups_traj] # coordinates from liquid sims
 xyz_orig_vac = [[] for i in file_tups_traj] # coordinates from gas sims
